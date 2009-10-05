@@ -1,0 +1,59 @@
+#!/bin/bash
+# SkoleLinux-dict 0.1
+# Copyright (C) 2004 Eskild Hustvedt 2004
+#       
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 # GNU General Public License for more details.
+#       
+# You should have received a copy of the GNU General Public License             # along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
+#
+# The data supplied to this software is Copyright their respective author
+echo ""
+echo "SkoleLinux-dict versjon 0.1"
+LIST="./Fellesordl.eng-no"
+while [ "$#" -gt "0" ]; do
+	case $1 in
+		--liste ) if [ -e $2 ]; then
+			LIST="$2"
+		else
+			echo "--liste: Kunne ikke finne \"$2\""
+			exit 1
+		fi
+	       shift 2	;;
+		--help ) echo "Copyright (C) Eskild Hustvedt 2004"
+		echo ""
+		echo "--liste X        Sett ordliste til X"
+		exit 0
+		;;
+		*) echo "Ugyldig parameter: $1"
+		exit 1;;
+	esac
+done
+trap 'echo ""; echo ""; echo "SkoleLinux-dict 0.1 copyright (C) Eskild Hustvedt 2004"; exit 0' 2
+if [ -e "$LIST" ]; then
+	:
+else
+	echo ""
+	echo "FATAL FEIL: Kunne ikke finne ordliste: \"$LIST\""
+	exit 1
+fi
+echo "For å avslutte trykk [CTRL]+[C]"
+while [ "1" != "2" ]; do
+	echo ""
+	read -p "Ord: " word
+	echo "---"
+	var="`cat $LIST |grep -i "$word"`"
+	if [ "$var" == "" ]; then
+		echo "Fant ingen ord."
+	else
+		echo "$var"
+	fi
+	echo "---"
+done
