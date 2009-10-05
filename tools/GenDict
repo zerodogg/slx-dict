@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # GenDict
-# $Id: GenDict 34 2006-07-17 11:06:56Z zerodogg $
+# $Id: GenDict 42 2006-08-12 13:24:06Z zerodogg $
 # Copyright (C) Eskild Hustvedt 2006
 #
 # This program is free software; you can redistribute it and/or
@@ -73,8 +73,8 @@ my $InputFile = "$tempdir/Fellesordl.eng-no.html";
 my $OutFile = "./dictionary";
 
 # The current version of slx-dict
-my $Version = "1.0";
-my $RCSRev = '$Id: GenDict 34 2006-07-17 11:06:56Z zerodogg $';
+my $Version = "1.0.1";
+my $RCSRev = '$Id: GenDict 42 2006-08-12 13:24:06Z zerodogg $';
 
 # Get $OutFile from the commandline if wanted
 if(defined($ARGV[0])) {

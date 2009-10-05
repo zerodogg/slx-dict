@@ -21,7 +21,7 @@ use Cwd qw/realpath getcwd/;
 use File::Basename;
 use File::Find;
 
-my $Version = "1.0";
+my $Version = "1.0.1";
 my $TargetTarDir = "slx-dict-$Version";
 
 sub InPath ($) {

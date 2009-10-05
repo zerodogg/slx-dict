@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # slx-dict
-# $Id: slx-dict 41 2006-07-18 02:03:21Z zerodogg $
+# $Id: slx-dict 42 2006-08-12 13:24:06Z zerodogg $
 # Copyright (C) Eskild Hustvedt 2006
 #
 # This program is free software; you can redistribute it and/or
@@ -26,8 +26,8 @@ use POSIX;
 require 5.6.0;
 
 die("\$HOME is not properly set\n") unless defined($ENV{HOME}) and length($ENV{HOME}) and -d $ENV{HOME} and -w $ENV{HOME};
-my $Version = "1.0";				# Version number
-my $RCSVer = '$Id: slx-dict 41 2006-07-18 02:03:21Z zerodogg $'; # RCS revision
+my $Version = "1.0.1";				# Version number
+my $RCSVer = '$Id: slx-dict 42 2006-08-12 13:24:06Z zerodogg $'; # RCS revision
 my $HomeDir = "$ENV{HOME}/.slxdict/";		# The data dir
 my $DictFile = "$HomeDir/dictionary";		# The file to read the dictionary data from
 my %Dict;					# The main dictionary hash. Referred to as %main::Dict from now on to
@@ -238,15 +238,18 @@ sub Command ($) {
 		CommandPrint("help/hjelp/h", "Vis denne hjelpskjermen");
 		CommandPrint("quit/exit/q", "Avslutt");
 		CommandPrint("upd/oppd", "Oppdater ordlista");
+		CommandPrint("version", "Vis slx-dict versjonen");
 		print "\nSkriv inn ordet eller uttrykket på engelsk for å få den norske omsetjinga.\n";
 		print "Skriv inn ! og ordet eller uttrykket på Norsk for å få den Engelske teksten\n";
-	} elsif (/^(q|exit|quit)/i) {
+	} elsif (/^(q|exit|quit|end)/i) {
 		print "slx-dict versjon $Version\n";
 		exit(0);
 	} elsif(/^(upd|oppd)/) {
 		UpdateDict();
+	} elsif(/^version/) {
+		print "slx-dict versjon $Version\n";
 	} else {
-		print "Unrecognized command: $_\n";
+		print "Ukjent kommando: $_\n";
 	}
 }
 
@@ -409,9 +412,10 @@ my $term = Term::ReadLine->new('slx-dict');	# Readline object
 my $attribs = $term->Attribs;
 $attribs->{completion_entry_function} = $attribs->{list_completion_function};
 no warnings;	# We need to ignore warnings for this one. It will warn even though it's correct
-$attribs->{completion_word} = [qw(#quit #exit #help #update #oppdater)];
+$attribs->{completion_word} = [qw(#quit #exit #help #update #oppdater #version)];
 use warnings;
 
+print "\033]0;slx-dict $Version\007";		# Set the terminal title
 print "Skriv #help for ei kommandoliste\n";
 # Main loop
 while(1) {
@@ -419,6 +423,8 @@ while(1) {
 	my $Input = $term->readline('Ord: ');
 	# If it only contains whitespace or nothing at all then we don't have anything
 	# to process
+	next unless defined($Input);
+	next unless length($Input);
 	next unless $Input =~ /\S/;
 	# Remove leading whitespace
 	$Input =~ s/^\s*//;
