@@ -1,0 +1,7 @@
+SLX-Dict version history
+************************
+
+Version 1.0 (Unreleased)
+----------------------------------
+- Complete rewrite in perl of the client (slx-dict) and
+  dictionary generator (GenDict).

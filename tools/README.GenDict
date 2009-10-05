@@ -1,0 +1,7 @@
+GenDict is the tool used to generate the slx-dict dictionaries from the
+main html file.
+
+Simply run ./GenDict to generate a dictionary. It requires perl, wget and html2text.
+
+GenDict can take a single parameter, the file to write the dictionary to.
+So ./GenDict ~/dictionary writes the dictionary to ~/dictionary.

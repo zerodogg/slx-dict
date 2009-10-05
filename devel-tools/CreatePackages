@@ -1,0 +1,132 @@
+#!/usr/bin/perl
+# CreatePackages
+# Copyright (C) Eskild Hustvedt 2006
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+use File::Temp;
+use Cwd qw/realpath getcwd/;
+use File::Basename;
+use File::Find;
+
+my $Version = "1.0";
+my $TargetTarDir = "slx-dict-$Version";
+
+sub InPath ($) {
+	foreach (split /:/, $ENV{PATH}) { if (-x "$_/@_" and ! -d "$_/@_" ) {	return 1; } } return 0;
+}
+
+$| = 1;
+
+print "Preparing...\n";
+my $tempdir = File::Temp::tempdir( 
+	CLEANUP => 1
+);
+print " Detecting the source directory...";
+my $OrigDir = dirname(realpath($0));
+unless(-e "$OrigDir/slx-dict") {
+	$OrigDir = "$OrigDir/../";
+	unless (-e "$OrigDir/slx-dict") {
+		$OrigDir = "$OrigDir/../../";
+		unless (-e "$OrigDir/slx-dict") {
+			die "failed - I'm giving up. Run me from the tools directory in the day planner source tree please.\n";
+		}
+	}
+}
+$OrigDir = realpath($OrigDir);
+print "found $OrigDir\n";
+
+print " Verifying required components...";
+
+my @RequiredComponents;
+
+@RequiredComponents = qw/tar bzip2 bunzip2 pod2man pod2text/;
+
+foreach (@RequiredComponents) {
+	unless (InPath($_)) {
+		die("failed - \"$_\" is missing\n");
+	}
+	print ".";
+}
+
+print "okay\n";
+print " Created temporary directory $tempdir\n";
+unless(-e "$OrigDir/packages") {
+	mkdir("$OrigDir/packages");
+	print " Created directory $OrigDir/packages\n";
+} else {
+	print " Cleaning $OrigDir/packages/...";
+	foreach(<$OrigDir/packages/*>) {
+		print ".";
+		unlink($_);
+	}
+	print "done\n";
+}
+
+chdir($tempdir) or die "Unable to chdir to $tempdir: $!\n";
+
+print "Building tarball...\n";
+# Copy the files
+print " Copying files...";
+if (system("cp -r $OrigDir $tempdir/slx-dict-$Version/")) {
+	die "failed\n";
+}
+print "done\n";
+
+# Remove SVN files
+print "Removing files not present in SVN...";
+find(sub {
+	# Skip SVN files
+	return if $File::Find::name =~ m#/\.svn#;
+	return if -d $File::Find::name;
+
+	unless(-e "./.svn/text-base/$_.svn-base") {
+		print ".";
+		unlink($_);
+	}
+}, $tempdir);
+print "done\n";
+
+# Remove junk
+print " Cleaning up the source directory...";
+system("rm -rf `find $tempdir/$TargetTarDir/ -name '*.svn*'`");
+print ".";
+system("rm -rf $tempdir/$TargetTarDir/packages/");
+print ".";
+system("rm -rf `find $tempdir/$TargetTarDir/ -name '*~'`");
+print ".";
+system("rm -rf `find $tempdir/$TargetTarDir/ -name '*.tmp'`");
+print ".";
+system("rm -rf `find $tempdir/$TargetTarDir/ -name '*.swp'`");
+print "done\n";
+
+# Create the documentation
+print " Creating manpage...";
+if(system("pod2man -c 'SLX-Dict' $tempdir/$TargetTarDir/slx-dict > ./$TargetTarDir/slx-dict.1")) {
+	die("failed\n");
+}
+print "done\n";
+print " Creating README...";
+if(system("pod2text $tempdir/$TargetTarDir/slx-dict > ./$TargetTarDir/README")) {
+	die("failed\n");
+}
+print "done\n";
+
+print " Packaging...";
+if (system("tar -jcf ./slx-dict-$Version.tar.bz2 ./slx-dict-$Version &> /dev/null")) {
+	die "failed\n";
+}
+system("mv ./slx-dict-$Version.tar.bz2 $OrigDir/packages/");
+print "done\n";

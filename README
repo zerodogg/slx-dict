@@ -1,0 +1,109 @@
+NAME
+    slx-dict - A simple tool to look up words in the skolelinux en->no
+    dictionary
+
+SYNOPSIS
+    slx-dict [OPTIONS]
+
+DESCRIPTION
+    slx-dict is a simple tool to look up words in the skolelinux en->no
+    dictionary. It can take words on the commandline and using the
+    interactive interface.
+
+    Running slx-dict without any parameters starts the interactive
+    interface.
+
+OPTIONS
+    -h, --help, --hjelp
+        Display a commandline parameter summary.
+
+    -o, -u, --oppdater, --update
+        Update the dictionary to the last one available.
+
+INTERACTIVE USAGE
+    The interactive mode of slx-dict works by typing in the English word or
+    phrase and then pressing enter. Slx-dict will then reply the Norwegian
+    translation of that word or phrase.
+
+    You can also enter a Norwegian word or phrase to get the English version
+    of that word or phrase by prefixing the line with an exclamation mark
+    (!).
+
+    You can also enter commands to slx-dict. The list of commands is below.
+
+  INTERACTIVE COMMANDS
+    Each command is prefixed by a hash sign (#).
+
+    #help, #hjelp, #h
+        Display a small help screen
+
+    #quit, #exit, #q
+        Quit slx-dict
+
+    #upd, #oppd
+        Update the dictionary (same as the -o commandline option).
+
+NON-INTERACTIVE USAGE
+    Non-interactive usage is very similar to interactive usage, with the
+    notable exception that commands aren't available (but commandline
+    arguments are). Note however that bash (the very comon shell) treats !
+    in a special way so you will need to use it with single quotes ('').
+    "slx-dict !word" won't work but "slx-dict '!word'" will.
+
+REGULAR EXPRESSION SUPPORT
+    slx-dict supports limited regular expressions. It supports ^ which
+    indicates "at the beginning of the line", $ which indicates "at the end
+    of the line" and ? which indicates that the preceeding letter does not
+    need to be present. All whitespace is flexible. So a single space is the
+    same as 100 spaces (in regex terms all whitespace is converted to one
+    single \s+).
+
+    Searching for: "^test" matches all lines *starting with* the word test.
+
+    Searching for: "test$" matches all lines *ending with* the word test.
+
+    Searching for: "conten?x?t" matches all lines containing the word
+    "context", "content" or "contet".
+
+    You can also mix characters in a single expression. Searching for:
+    "controls?$" will match lines ending with control and controls. So it
+    will result in both "controls" and "discretionary access control" while
+    searching for "^controls?$" will only result in controls.
+
+CONFIGURATION FILE
+    slx-dict saves its data and configuration file to ~/.slxdict/.
+
+    The configuration file is ~/.slxdict/slxdict.conf
+
+  CONFIGURATION OPTIONS
+    DictURL
+        The full URL of to download the dictionary from. It defaults to
+        *http://developer.skolelinux.no/~zerodogg/slx-dict/upd/dictionary*
+        which is the official dictionary mirror as of this release.
+
+    MaxRun
+        The maximum amount of times slx-dict can be run before it
+        automatically checks if there is an updated dictionary available.
+        Defaults to 50.
+
+    RunTimes
+        The amount of times slx-dict has been run since the last dictionary
+        update. This value is increased on every invocation of slx-dict. You
+        usually don't need to change this value manually.
+
+    NoVersionCheck
+        This value is not in the configuration file by default but you can
+        add it there manually. If it is set to any number other than 0
+        slx-dict will not notify you about the availability of a new
+        slx-dict release.
+
+AUTHOR
+    Eskild Hustved - "<eskild@mandriva.org>"
+
+COPYRIGHT & LICENSE
+    Copyright (C) 2006 Eskild Hustvedt, all rights reserved.
+
+    This is free software; see the source for copying conditions. There is
+    NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR
+    PURPOSE.
+

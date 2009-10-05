@@ -1,0 +1,196 @@
+#!/usr/bin/perl
+# GenDict
+# $Id: GenDict 34 2006-07-17 11:06:56Z zerodogg $
+# Copyright (C) Eskild Hustvedt 2006
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+use strict;
+use warnings;
+use Data::Dumper;
+use Digest::MD5 qw(md5_hex);
+use File::Temp;
+use Sys::Hostname;
+
+# Which mode to use to convert to UTF-8
+my $ConvertMode;
+my $tempdir = File::Temp::tempdir(
+	CLEANUP => 1
+) or die("Tempdir creation FAILED\n");
+
+# Detect which module to use to convert strings to UTF-8.
+# Old perls use Unicode::String for this, but this is not available in
+# later perls which use Encode, and Encode is not available in older perls.
+if(eval("use Encode; 1;")) {
+	$ConvertMode = "Encode";
+} elsif (eval("use Unicode::String; Unicode::String->stringify_as('utf8'); 1;")) {
+	$ConvertMode = "old";
+} else {
+	$ConvertMode = undef;
+	warn("Found no module to convert to UTF-8 (either Encode or Unicode::String needed). Will continue but the output may not be proper UTF-8\n");
+}
+
+# Purpose: Find out if a command is in PATH or not
+# Usage: InPath(COMMAND);
+sub InPath ($) {
+	foreach (split /:/, $ENV{PATH}) { if (-x "$_/@_" and ! -d "$_/@_" ) {   return 1; } } return 0;
+}
+
+# Purpose: Convert a string to UTF-8
+# Usage: $string = ToUtf8($string);
+sub ToUtf8 ($) {
+	my $string = $_[0];
+	return($string) unless(defined($string));
+	return($string) unless(defined($ConvertMode));
+	if($ConvertMode eq "Encode") {
+		return(encode("utf8", $string));
+	} else {
+		my $obj = Unicode::String::latin1($string);
+		return($obj->as_string);
+	}
+}
+
+
+# Verify environment
+die("I need wget\n") unless InPath("wget");
+die("I need perl to be in \$PATH\n") unless InPath("perl");
+die("I need html2text\n") unless InPath("html2text");
+
+# Input and output files
+my $InputFile = "$tempdir/Fellesordl.eng-no.html";
+my $OutFile = "./dictionary";
+
+# The current version of slx-dict
+my $Version = "1.0";
+my $RCSRev = '$Id: GenDict 34 2006-07-17 11:06:56Z zerodogg $';
+
+# Get $OutFile from the commandline if wanted
+if(defined($ARGV[0])) {
+	$OutFile = $ARGV[0];
+}
+
+# Verify $OutFile
+if(-e $OutFile) {
+	die("$OutFile is a directory\n") if -d $OutFile;
+	die("$OutFile is not writable\n") unless -w $OutFile;
+}
+
+# Remove $InputFile if it exists, it shouldn't.
+unlink($InputFile) if -e $InputFile;
+
+# Wget the dictionary. Die if it fails (remember, system returns true on *failure*).
+system("wget -O $InputFile -q http://i18n.skolelinux.no/nb/Fellesordl.eng-no.html") and die("Unable to download dictionary\n");
+
+# Use perl to fix <del> tags (easier to use perl -pi than doing it here
+system("perl -pi -e 's#<del>#--[NOT]--#gi;s#</del>#--[/NOT]--#gi' $InputFile") and warn("perl -pi process exited unexpectedly\n");
+
+# Use html2text to generate a text file which we can parse
+system("html2text -nobs -width 99999999999 -o $tempdir/fellesordl.parsed $InputFile") and die("html2text process exited unexpectedly\n");
+
+# Unlink $InputFile, we don't need it any more
+unlink($InputFile);
+
+# Open the cleartext version of the parsed html for reading
+open(PARSED, "<", "$tempdir/fellesordl.parsed") or die("Unable to open parsed file: $!");
+
+# Declerations for use with the parser
+my %Dict;
+
+my $LastEng;
+my $LineNo;
+
+# Read in each line of the text file
+foreach(<PARSED>) {
+	$LineNo++;			# Increase our line number counter
+	
+	# Ignore lines that doesn't have alot of whitespace
+	next unless /\s+\s+\s+/;
+	# Ignore lines that has nothing but whitespace
+	next unless /\S/;
+	# Ignore lines beginning with whitespace and then a *
+	next if /^\s+\*/;
+	chomp;
+	# Remove leading whitespace
+	s/^\s+//;
+	# Remove trailing whitespace
+	s/\s+$//;
+
+	# Initialize language vars
+	my $Eng = $_;
+	my $No = $_;
+
+	# Parse the English part or set it to undef
+	unless($Eng =~ s/\s+\s+\s+\s+\s+.+\S$//) {
+		$Eng = undef;
+	}
+
+	# Parse the Norwegian part or return a warning
+	unless ($No =~ s/^.+\s\s\s\s+(\S)/$1/) {
+		if(defined($Eng)) {
+			warn("\$No parsing failed on line $LineNo\n");
+			next;
+		} else {
+			$No =~ s/^\s+//;
+		}
+	}
+	$No = ToUtf8($No);
+	$Eng = ToUtf8($Eng);
+	
+	# Make sure the parsing went okay, if it did make proper changes to the hash
+	unless(defined($Eng)) {
+		unless(defined($LastEng)) {
+			warn("Fatal parsing error on line $LineNo\n");
+			next;
+		} else {
+			$Dict{$LastEng} .= "\n$No";
+		}
+	} else {
+		# Ignore lines containing this, useless in slx-dict
+		next if $No =~ /typografiske_uttryk_for_t/;
+		# Append to the hash and LastEng
+		$Dict{$Eng} = $No;
+		$LastEng = $Eng;
+	}
+}
+# Close the file
+close(PARSED);
+# Unlink the file, we don't need it any more
+unlink("$tempdir/fellesordl.parsed");
+
+my $md5 = md5_hex(%Dict);
+
+# Set some system vars for use by slx-dict
+$Dict{SLXDICT_SYSTEM}{LatestVer} = $Version;
+$Dict{SLXDICT_SYSTEM}{UPDATED} = scalar(localtime);
+$Dict{SLXDICT_SYSTEM}{md5} = $md5;
+$Dict{SLXDICT_SYSTEM}{buildhost} = hostname();
+$Dict{SLXDICT_SYSTEM}{builduser} = getlogin or undef;
+
+# Open up the output file for writing
+open(OUTFILE, ">", $OutFile) or die("FATAL: Failed to open $OutFile for writing: $!\n");
+
+# Write the initial comments
+print OUTFILE "# Dictionary data for slx-dict\n\n# Generated at " . scalar(localtime) . " by GenDict\n# revision $RCSRev.\n\n# The syntax is that of a perl hash\n# Warning: A single syntax error in this file will make slx-dict stop working\n";
+
+# Make Data::Dumper output in a pretty format that is usable by perl
+no warnings;
+$Data::Dumper::Purity = 1;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Indent = 1;
+use warnings;
+# Dump the hash
+print OUTFILE Data::Dumper->Dump([\%Dict], ["*Dict"]);
+
+# Okay, all done :)

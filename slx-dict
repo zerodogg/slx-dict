@@ -1,8 +1,8 @@
-#!/bin/bash
-# slx-dict version 0.6
-# Copyright (C) Eskild Hustvedt 2005
-# <zerodogg [at] skolelinux [dot] no>
-#       
+#!/usr/bin/perl
+# slx-dict
+# $Id: slx-dict 41 2006-07-18 02:03:21Z zerodogg $
+# Copyright (C) Eskild Hustvedt 2006
+#
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
@@ -12,279 +12,555 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-#       
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
-#
-# The data supplied to this software is Copyright their respective author
-#
-# Oppsettet er i $SLXHOMEDIR/config
-#
-SLXHOMEDIR="$HOME/.slxdict/"
-#
-echo ""
-ver="0.6"
-echo "slx-dict versjon $ver"
-# Dette er standardvariabler. Trenger du å endre noe gjør det i $SLXHOMEDIR/config
-LIST="$SLXHOMEDIR/Fellesordl.eng-no"
-tjener="http://developer.skolelinux.no/~zerodogg/SkoleLinux-dict/"
-MAXRUN="50"
-NODIFF="0"
-JEGER="`basename $0`"
-DispHelp ()
-{
-	echo "Bruk: $JEGER"
-	echo "      $JEGER [VALG]"
-	echo "      $JEGER ORD1"
-	echo ""
-	echo "-o,   --oppdater          Oppdater til nyeste ordliste"
-	echo "-mo,  --myk-oppdatering   Oppdater til nyeste ordliste og start slx-dict"
-	echo "-id,  --ingen-diff        Ikke vis diff etter oppdatering"
-	echo "-l,   --liste             Bruk ordliste X"
-	echo "-h,   --hjelp             Vis denne hjelp meldingen"
-	echo ""
-	echo "-id/--ingen-diff må gis før -o/--oppdater eller -mo/--myk-oppdatering"
-	echo ""
-	echo "Copyright (C) Eskild Hustvedt 2005"
-}
-# Autooppdag nedlaster automatisk hvis nødvendig
-DetectDownl ()
-{
-	if [ "$downloader" == "" ]; then
-		if type wget &>/dev/null; then
-			downloader="wget -q"
-		elif type curl &>/dev/null; then
-			downloader="curl -sO"
-		else
-			downloader=""
-		fi
-	fi
-}
-# Søk etter ord
-OrdSoek ()
-{
-	if [ "$#" == "0" ]; then return 0;fi
-	case $1 in
-		!o ) DictUpd; echo "";;
-		* ) local SOEK="`grep -v '#' $LIST | grep -i -- "$*"`"
-	if [ "$SOEK" != "" ]; then
-		LangHeader
-		echo "$SOEK"
-		return 0
-	elif [ "$#" == "1" ]; then
-		echo "Fant ingen ord."
-		return 0
-	fi
-	echo -n "Fant ingen ord, prøver uklart søk..."
-	local ORIGOPT="$*"
-	local SOEK="`grep -v '#' $LIST | grep -i -- $1`";shift 1
-	while [ "$#" -gt "0" ]; do
-		local SOEK="`echo "$SOEK" |grep -i -- "$1"`"
-		shift 1
-	done
-	if [ "$SOEK" != "" ]; then
-		echo " funnet";	LangHeader
-		echo "$SOEK"
-	else
-		echo -n " mislyktes. Søker etter individuelle ord..."
-		for a in $ORIGOPT; do
-			local SOEK="`grep -v '#' $LIST |grep -i -- $a`"
-			if [ "$SOEK" != "" ]; then
-				local TREFF="$TREFF $a"
-			fi
-		done
-		if [ "$TREFF" == "" ]; then
-			echo "mislyktes"
-		else
-			echo ""
-			echo -n "Fikk treff på:"
-			local var=0
-			for a in $TREFF; do
-				if [ "$var" == "1" ]; then echo -n ",";fi
-				echo -n " $a"
-				local var=1
-			done
-			echo "."
-		fi
-	fi ;;
-	esac
-}
-# Overskriften som viser språk
-LangHeader ()
-{
-	echo "Engelsk:                                                           Norsk:"
-	echo "--------                                                           ------"
-}	
-# Oppdater ordbok
-DictUpd ()
-{
-	DetectDownl
-	local FELLESEXIST=0
-	echo ""
-	if [ "$downloader" == "" ]; then
-		echo "Kunne ikke oppdage en nedlaster"
-		echo "Enten sett \"downloader=\" i denne fila til en nedlaster eller"
-		echo "installer enten wget eller curl"
-		return 1
-	fi
-	echo "0" > ./.SLX_RUNTIMES
-	echo -n "Laster ned ordbok..."
-	if type bunzip2 &>/dev/null; then
-		$downloader $tjener/upd/Fellesordl.eng-no_NEW.bz2
-		ret="$?"
-	else
-		$downloader $tjener/upd/Fellesordl.eng-no_NEW
-		ret="$?"
-	fi
-	if [ "$ret" != "0" ]; then
-		echo " mislyktes"
-		return 2
-	fi
-	echo " ferdig"
-	if type bunzip2 &>/dev/null; then
-		echo -n "Pakker ut..."
-		bunzip2 ./Fellesordl.eng-no_NEW.bz2
-		if [ "$?" != "0" ]; then
-			echo " mislyktes"
-			return 2
-		fi
-		echo " ferdig"
-	fi
-	if [ -e ./Fellesordl.eng-no ]; then
-		local FELLESEXIST=1
-		if ! type md5sum &>/dev/null; then
-			echo "\"md5sum\" ikke tilgjengelig, kan ikke sjekke om det er noen oppdatering tilgjengelig"
-			echo "Tvinger oppdatering"
-		else
-			NEWMD5="`md5sum ./Fellesordl.eng-no_NEW |sed -e s/"_NEW"//g`"
-			OLDMD5="`md5sum ./Fellesordl.eng-no`"
-			if [ "$NEWMD5" == "$OLDMD5" ]; then
-				echo "Ingen oppdatering tilgjengelig"
-				rm -f ./Fellesordl.eng-no_NEW
-				return 0
-			fi
-		fi
-	fi
-	echo -n "Oppdaterer...."
-	if type diff &>/dev/null && [ "$FELLESEXIST" == "1" ] && [ "$NODIFF" != "1" ]; then
-		diff="`diff -BrauN ./Fellesordl.eng-no ./Fellesordl.eng-no_NEW`"
-	fi
-	mv -f ./Fellesordl.eng-no_NEW ./Fellesordl.eng-no
-	echo " ferdig"
-	echo ""
-	if type diff &>/dev/null && [ "$FELLESEXIST" == "1" ] && [ "$NODIFF" != "1" ]; then
-		echo "Vil du se hvilke endringer som har blitt gjort (diff)?"
-		read -n 1 -p "J/N? " DOYOU
-		case $DOYOU in
-			J | j | Y | y ) echo "--- diff: ---"
-			echo "$diff"
-			echo "---       ---";;
-		esac
-	else
-		if [ "$FELLESEXIST" == "1" ] && [ "$NODIFF" != "1" ]; then echo "\"diff\" er ikke tilgjengelig, kan ikke vise endringslogg"; fi
-	fi
-}
-# Last ordlisten
-InitOrdliste ()
-{
-	if [ ! -e $LIST ]; then
-		echo ""
-		echo "FATAL FEIL: Kunne ikke finne ordliste: \"$LIST\""
-		echo "Pørver å tvinge oppdatering..."
-		DictUpd
-		if [ !  -e $LIST ]; then
-			echo ""
-			echo "Oppdateringen mislyktes, er du koblet til internett?"
-			exit 1
-		fi
-	fi
-}
-# Sjekk at SLXHOMEDIR finnes
-if [ ! -e $SLXHOMEDIR ]; then
-	echo ""
-	FLYFELL="0"
-	echo -n "Fant ikke $SLXHOMEDIR, oppretter..."
-	mkdir -p $SLXHOMEDIR || exit $?
-	if [ -e ./Fellesordl.eng-no ]; then
-		FLYFELL="1"
-		echo -n " flytter ./Fellesordl.eng-no..."
-		mv ./Fellesordl.eng-no $SLXHOMEDIR/
-	fi
-	echo -n " skriver oppsettsfil..."
-	cat << EOF > $SLXHOMEDIR/config
-# Slx-Dict oppsettsfil (for versjon $ver)
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-# Lenke til tjeneren og mappen hvor oppdateringer av ordlisten ligger
-tjener="$tjener"
+use strict;
+use warnings;
+use Term::ReadLine;
+use Getopt::Long;
+use POSIX;
 
-# Sett dette til programmet du vil at slx-dict skal bruke til å laste ned
-# ordbøker og nye versjoner med.
-# Hvis den ikke er satt vil slx-dict prøve å oppdage automatisk.
-downloader=""
+require 5.6.0;
 
-# Set MAXRUN til hvor mange ganger du vil at slx-dict skal starte opp
-# uten å sjekke etter oppdateringer.
-MAXRUN="$MAXRUN"
-EOF
-	echo "$MAXRUN" > $SLXHOMEDIR/.SLX_RUNTIMES
-	echo "ferdig"
-	if [ "$FLYFELL" == "0" ]; then
-		cd "$SLXHOMEDIR"
-		echo "Tvinger oppdatering av ordlisten."
-		echo ""
-		DictUpd
-	fi
-fi
-. $SLXHOMEDIR/config
-cd "$SLXHOMEDIR"
-while [ "$#" -gt "0" ]; do
-	case $1 in
-		-l | --liste | --ordliste ) if [ -e $2 ]; then
-			LIST="$2"
-		else
-			echo "--liste: Kunne ikke finne \"$2\""
-			exit 1
-		fi
-	       shift 1	;;
-		-h | --help | --hjelp ) DispHelp
-		exit 0
-		;;
-		-o | --oppdater ) DictUpd
-		exit $?
-		;;
-		-mo | --myk-oppdatering ) DictUpd;echo "" ;;
-		-id | --ingen-diff ) NODIFF=1;;
-		*) InitOrdliste; 
-		for a in "$@"; do
-			echo ""
-			echo "Søker etter «$a»:"
-			OrdSoek "$a"
-		done; exit 0;;
-	esac
-	shift 1
-done
-touch ./.SLX_RUNTIMES
-# Sjekk om vi har blitt kjørt $MAXRUN ganger, hvis vi har det - oppdater ordlisten
-var="`cat ./.SLX_RUNTIMES`"
-let var="$var+1"
-if [ "$var" -ge "$MAXRUN" ]; then
-	var=0
-	echo "SkoleLinux-dict har blitt kjørt 50 ganger uten å oppdatere ordlisten."
-	echo "Tvinger oppdatering."
-	DictUpd
-fi
-echo "$var" > ./.SLX_RUNTIMES
-trap 'echo ""; echo ""; echo "Slx-Dict $ver copyright (C) Eskild Hustvedt 2005"; exit 0' 2
-echo "For å avslutte trykk [CTRL]+[C] - skriv !o for å oppdatere ordlisten"
-InitOrdliste
-echo ""
-while true; do
-	read -p "Ord: " word
-	if [ "$word" != "" ]; then
-		echo "* * *"
-		OrdSoek $word
-		echo "* * *"
-		echo ""
-	fi
-done
+die("\$HOME is not properly set\n") unless defined($ENV{HOME}) and length($ENV{HOME}) and -d $ENV{HOME} and -w $ENV{HOME};
+my $Version = "1.0";				# Version number
+my $RCSVer = '$Id: slx-dict 41 2006-07-18 02:03:21Z zerodogg $'; # RCS revision
+my $HomeDir = "$ENV{HOME}/.slxdict/";		# The data dir
+my $DictFile = "$HomeDir/dictionary";		# The file to read the dictionary data from
+my %Dict;					# The main dictionary hash. Referred to as %main::Dict from now on to
+						# work around limitations in older versions of perl.
+my %Config;
+
+# Configuration defaults
+$Config{DictURL} = "http://developer.skolelinux.no/~zerodogg/slx-dict/upd/dictionary";
+$Config{MaxRun} = 50;
+$Config{RunTimes} = 0;
+
+# Write our configuration file and die on SIGINT
+$SIG{INT} = sub {
+	WriteConfig();
+	die("\n");
+};
+
+# Write configuration file on END
+END {
+	WriteConfig();
+}
+
+# Purpose: Load our configuration file
+# Usage: LoadConfig();
+sub LoadConfig () {
+	unless(-d $HomeDir) {
+		mkdir($HomeDir) or die("mkdir($HomeDir) failed: $!\n");
+	}
+	# Remove files from pre-1.0 slx-dict
+	unlink("$HomeDir/config") if -e "$HomeDir/config";
+	unlink("$HomeDir/Fellesordl.eng-no") if -e "$HomeDir/Fellesordl.eng-no";
+	unlink("$HomeDir/.SLX_RUNTIMES") if -e "$HomeDir/.SLX_RUNTIMES";
+
+
+	my %Settings = (
+		"RunTimes" => "NUM",
+		"MaxRun" => "NUM",
+		"NoVersionCheck" => "NUM"
+	);
+
+	if (-e "$HomeDir/slxdict.conf") {
+	
+		open(CONFIG, "<", "$HomeDir/slxdict.conf") or die("Failed to open $HomeDir/slxdict.conf for reading: $!");
+	
+		foreach(<CONFIG>) {
+			next if m/^\s*(#.*)?$/;
+			next unless m/=/;
+			chomp;
+			my $Option = $_;
+			my $Value = $_;
+			$Option =~ s/^\s*(.*)\s*=.*/$1/;
+			$Value =~ s/^.*=\s*(.*)\s*/$1/;
+			if(defined($Settings{$Option})) {
+				if($Settings{$Option} eq "NUM") {
+					unless ($Value =~ /^\d+$/) {
+						print "Invalid setting of $Option in the config file: Must be numeric. Ignoring.\n";
+						next;
+					}
+				}
+			}
+			$Config{$Option} = $Value;
+		}
+		close(CONFIG);
+	}
+	
+	# FIXME: Compatibility hack for pre release versions of 1.0. Remove in subsequent releases
+	if($Config{DictURL} =~ m#/$#) {
+		$Config{DictURL} = "$Config{DictURL}/dictionary";
+	}
+	$Config{RunTimes}++;
+}
+
+# Purpose: Write our configuration file
+# Usage: WriteConfig();
+sub WriteConfig () {
+	my %Explenations = (
+		"DictURL" => "The URL to the dictionary (for updates)",
+		"MaxRun" => "The maximum amount of times slx-dict can be run without updating the dictionary",
+		"RunTimes" => "How many times slx-dict has been run since the last update. Updated on each invocation of slx-dict",
+		"NoVersionCheck" => "If set to true, disables checking for new versions of slx-dict"
+	);
+	open(CONFIG, ">", "$HomeDir/slxdict.conf") or warn("Failed to write configuration to $HomeDir/slxdict.conf!: $!\n") and return;
+	print CONFIG "# slx-dict configuration file\n";
+	foreach(sort(keys(%Config))) {
+		next unless length($Config{$_});	# Don't write empty options
+		if(defined($Explenations{$_})) {
+			print CONFIG "\n# $Explenations{$_}";
+		}
+		print CONFIG "\n$_=$Config{$_}\n";
+	}
+	close(CONFIG);
+}
+
+# Purpose: Find out if a command is in PATH or not
+# Usage: InPath(COMMAND);
+sub InPath ($) {
+	foreach (split /:/, $ENV{PATH}) { if (-x "$_/@_" and ! -d "$_/@_" ) {   return 1; } } return 0;
+}
+
+# Purpose: Update our dictionary file
+# Usage: UpdateDict();
+sub UpdateDict {
+	$| = 1;			# Don't cache output to STDOUT
+	my $OldMD5;		# The md5sum of the old dictionary
+	my $NewMD5;		# The md5sum of the new dictionary
+	
+	# If the old dictionary file exists then load it
+	if(-e "$HomeDir/dictionary") {
+		LoadDictionary("UPDATE");
+		if(defined($main::Dict{SLXDICT_SYSTEM}{md5})) {
+			$OldMD5 = $main::Dict{SLXDICT_SYSTEM}{md5};
+		}
+	}
+
+	# Download the dictionary
+	print "Lastar ned ordliste...";
+	if(InPath("curl")) {
+		system("curl -s -o $HomeDir/dictionary $Config{DictURL}") and warn("Download failed\n") and return(0);
+		print "ferdig\n";
+	} elsif (InPath("wget")) {
+		system("wget -q -O $HomeDir/dictionary $Config{DictURL}") and warn("Download failed\n") and return(0);
+		print "ferdig\n";
+	} else {
+		print "mislyktes.\nDu har verken curl eller wget installert. Installer ein av dei for Ã¥\nta i bruk oppdateringsfunksjonen.\n";
+		return(0);
+	}
+
+	# Load the new dictionary
+	LoadDictionary("UPDATE");
+
+	# If OldMD5 is defined then check the md5sum of the new dictionary vs the old one
+	if(defined($OldMD5) and defined($main::Dict{SLXDICT_SYSTEM}{md5})) {
+			$NewMD5 = $main::Dict{SLXDICT_SYSTEM}{md5};
+	}
+	$Config{RunTimes} = 1;
+	if(defined($NewMD5) and $NewMD5 eq $OldMD5) {
+		print "Ingen oppdatering tilgjengeleg\n";
+	} else {
+		print "Ordlista er oppdatert.\n";
+	}
+}
+
+# Purpose: Print an dictionary entry
+# Usage: PrintEntry(FROM, TO);$
+sub PrintEntry($$) {
+	$_[0] =~ s#--\[/?NOT\]--#-#g;
+	$_[1] =~ s#--\[/?NOT\]--#-#g;
+	printf "%-35s = %s\n", $_[0],  $_[1];	# TODO: Split this off into a subroutine that also does
+}
+
+# Purpose: Look up a pre-parsed phrase in the dictionary
+# Usage: Real_LookUp(WORD_OR_PHRASE, REVERSE?);
+sub Real_LookUp ($$) {
+	my $Regex = $_[0];
+	my $Reverse = $_[1];
+	my $Match = 0;
+	foreach(sort keys(%main::Dict)) {
+		next if /^SLXDICT_SYSTEM/;
+		my $RegexMatch;
+		$RegexMatch = $main::Dict{$_} if $Reverse;
+		$RegexMatch = $_ unless $Reverse;
+		$RegexMatch =~ s#--\[/?NOT\]--##g;
+		if ($RegexMatch =~ /$Regex/i) {
+			PrintEntry($_, $main::Dict{$_});
+			$Match = 1;
+		}
+	}
+	return($Match);
+}
+
+# Purpose: Look up a word in the dictionary. Lines beginning with ! means reverse lookup
+# 		(that is, look up in the Norwegian part instead of the English).
+# Usage: LookUp(WORD OR PHRASE);
+sub LookUp ($) {
+	# Reverse sets if the lookup is in the FROM or TO prts of the dictionary
+	my $Reverse;
+	$Reverse = 1 if $_[0] =~ s/^!//;
+	# This is the users input regexified
+	my $Regex = $_[0];
+	$Regex =~ s/(\(|\)|\\|\[|\.|\]|\*|\+|\-|\|)/\\$1/g;	# Remove "dangerous" regex metachars
+	$Regex =~ s/\s+/\\s+/;					# Flexible spacing
+	my $Match;
+	# Main search:
+	if(Real_LookUp($Regex,$Reverse)) {
+		$Match = 1;
+	} else {
+		# Fuzzy search
+		if($_[0] =~ /\s/) {
+			foreach my $FuzzyWord (split(/\s+/,$_[0])) {
+				if(Real_LookUp($FuzzyWord,$Reverse)) {
+					$Match =1;
+				}
+			}
+		}
+	}
+	print "Ingen treff!\n" unless $Match;
+}
+
+# Purpose: Process an internal slx-dict command
+# Usage: Command(COMMAND);
+sub Command ($) {
+	$_ = $_[0];		# For easier processing
+	s/^#\s*//;		# Remove leading # and whitespace
+	s/\s*$//;		# Remove trailing whitespace
+
+	if(/^help/i) {
+		print "Kommandoar:\n";
+		CommandPrint("help/hjelp/h", "Vis denne hjelpskjermen");
+		CommandPrint("quit/exit/q", "Avslutt");
+		CommandPrint("upd/oppd", "Oppdater ordlista");
+		print "\nSkriv inn ordet eller uttrykket pÃ¥ engelsk for Ã¥ fÃ¥ den norske omsetjinga.\n";
+		print "Skriv inn ! og ordet eller uttrykket pÃ¥ Norsk for Ã¥ fÃ¥ den Engelske teksten\n";
+	} elsif (/^(q|exit|quit)/i) {
+		print "slx-dict versjon $Version\n";
+		exit(0);
+	} elsif(/^(upd|oppd)/) {
+		UpdateDict();
+	} else {
+		print "Unrecognized command: $_\n";
+	}
+}
+
+# Purpose: Load the dictionary file
+# Usage: LoadDictionary();
+sub LoadDictionary {
+	my $OPTS = $_[0];
+	$OPTS = "" unless(defined($OPTS));
+	unless($OPTS eq "UPDATE") {
+		unless(-e "$HomeDir/dictionary") {
+			UpdateDict();
+		} else {
+			# Check if the dictionary needs updating
+			if($Config{RunTimes} >= $Config{MaxRun}) {
+				print "slx-dict har blitt starta $Config{RunTimes} gonger utan at ordlista har blitt\noppdatert. Tvinger oppdatering...\n";
+				UpdateDict();
+			} else {
+				UpdateDict() unless -e $DictFile;
+			}
+		}
+	}
+
+	# Load the dictionary
+	do($DictFile);				# Read the dictionary file
+
+	unless($OPTS eq "UPDATE") {
+		die("Dictionary initialization failed\n") unless(length(keys(%main::Dict)) > 1);
+
+		# Perform the version check
+		unless($Config{NoVersionCheck}) {
+			if(defined($main::Dict{SLXDICT_SYSTEM}{LatestVer})) {
+				print "Det er ein nyare versjon av slx-dict tilgjengeleg (versjon $main::Dict{SLXDICT_SYSTEM}{LatestVer}).\n" unless($main::Dict{SLXDICT_SYSTEM}{LatestVer} eq $Version);
+			}
+		}
+	}
+}
+
+# Purpose: Print formatted --help output
+# Usage: PrintHelp("-shortoption", "--longoption", "description");
+sub PrintHelp($$$) {
+	printf "%-4s %-16s %s\n", "$_[0]", "$_[1]", "$_[2]";
+}
+
+# Purpose: Get OS/distro version information
+# Usage: print "OS: ",GetDistVer(),"\n";
+sub GetDistVer () {
+	# GNU/Linux and BSD
+	foreach(qw/mandriva mandrakelinux mandrake fedora redhat red-hat ubuntu lsb debian gentoo suse distro dist slackware freebsd openbsd netbsd dragonflybsd NULL/) {
+		if (-e "/etc/$_-release" or -e "/etc/$_-version" or -e "/etc/${_}_version" or $_ eq "NULL") {
+			my ($DistVer, $File);
+			if(-e "/etc/$_-release") {
+				$File = "$_-release";
+				open(VERSION_FILE, "<", "/etc/$_-release");
+				$DistVer = <VERSION_FILE>;
+			} elsif (-e "/etc/$_-version") {
+				$File = "$_-version";
+				open(VERSION_FILE, "<", "/etc/$_-release");
+				$DistVer = <VERSION_FILE>;
+			} elsif (-e "/etc/${_}_version") {
+				$File = "${_}_version";
+				open(VERSION_FILE, "<", "/etc/${_}_version");
+				$DistVer = <VERSION_FILE>;
+			} elsif ($_ eq "NULL") {
+				last unless -e "/etc/version";
+				$File = 'version';
+				open(VERSION_FILE, "<", "/etc/version");
+				$DistVer = <VERSION_FILE>;
+			}
+			chomp($DistVer);
+			return("/etc/$File: $DistVer");
+		}
+	}
+	# Didn't find anything yet. Get uname info
+	my ($sysname, $nodename, $release, $version, $machine) = POSIX::uname();
+	if ($sysname =~ /darwin/i) {
+		my $DarwinName;
+		my $DarwinOSVer;
+		# Darwin kernel, try to get OS X info.
+		if(InPath("sw_vers")) {
+			if(open(SW_VERS, "sw_vers |")) {
+				foreach(<SW_VERS>) {
+					chomp;
+					if (s/^ProductName:\s+//gi) {
+						$DarwinName = $_;
+					} elsif(s/^ProductVersion:\s+//) {
+						$DarwinOSVer = $_;
+					}
+				}
+			}
+		}
+		if(defined($DarwinOSVer) and defined($DarwinName)) {
+			return("$DarwinName $DarwinOSVer ($machine)");
+		}
+	}
+	return("Unknown ($sysname $release $version $machine)");
+}
+
+# Purpose: Print a nicely formatted help output for commands available
+# Usage: CommandPrint(COMMAND, Description);
+sub CommandPrint ($$) {
+	printf "#%-18s %s\n", $_[0], $_[1];
+}
+
+# Load the config file
+LoadConfig();
+
+# Parse commandline options
+GetOptions (
+	'h|help|hjelp' => sub {
+		print "slx-dict versjon $Version\n\n";
+		PrintHelp("-h", "--help", "Vis denne hjelpteksten");
+		PrintHelp("-o", "--oppdater", "Oppdater ordlista");
+		PrintHelp("-v", "--version", "Vis versjonsinformasjon");
+		PrintHelp("","--debuginfo", "Vis feilsÃ¸kingsinformasjon");
+		exit(0);
+	},
+	'o|u|oppdater|update' => sub {
+		UpdateDict() and exit(0);
+	},
+	'v|version|versjon' => sub {
+		print "slx-dict versjon $Version\n";
+		exit(0);
+	},
+	'debuginfo' => sub {
+		print "slx-dict debugging information\n\n";
+		print "slx-dict version $Version\nRCSRev: $RCSVer\n";
+		printf "Perl version %vd\n", $^V;
+		print "OS: ", GetDistVer(), "\n";
+		print "Config:\n";
+		foreach(keys(%Config)) {
+			print " $_ => $Config{$_}\n";
+		}
+		LoadDictionary();
+		print "Dictionary:\n";
+		foreach(qw/LatestVer UPDATED md5 buildhost builduser/) {
+			if(defined($main::Dict{SLXDICT_SYSTEM}{$_})) {
+				print " $_ => $main::Dict{SLXDICT_SYSTEM}{$_}\n";
+			} else {
+				print " $_ => undef!\n";
+			}
+		}
+		exit(0);
+	}
+
+) or die("SjÃ¥ $0 --help\n");
+
+
+# Load the dictionary file
+LoadDictionary();
+
+# Handle words on the commandline
+if(@ARGV) {
+	foreach(@ARGV) {
+		LookUp("$_");
+	}
+	exit(0);
+}
+
+my $term = Term::ReadLine->new('slx-dict');	# Readline object
+my $attribs = $term->Attribs;
+$attribs->{completion_entry_function} = $attribs->{list_completion_function};
+no warnings;	# We need to ignore warnings for this one. It will warn even though it's correct
+$attribs->{completion_word} = [qw(#quit #exit #help #update #oppdater)];
+use warnings;
+
+print "Skriv #help for ei kommandoliste\n";
+# Main loop
+while(1) {
+	# Get input from the user
+	my $Input = $term->readline('Ord: ');
+	# If it only contains whitespace or nothing at all then we don't have anything
+	# to process
+	next unless $Input =~ /\S/;
+	# Remove leading whitespace
+	$Input =~ s/^\s*//;
+	# If the input begins with # it's a command, if not it's a word/phrase
+	if($Input =~ /^#/) {
+		next unless $Input =~ /^#.*\S/;
+		Command($Input);
+	} else {
+		LookUp($Input);
+	}
+}
+
+__END__
+
+=head1 NAME
+
+slx-dict - A simple tool to look up words in the skolelinux en->no dictionary
+
+=head1 SYNOPSIS
+
+slx-dict [OPTIONS]
+
+=head1 DESCRIPTION
+
+slx-dict is a simple tool to look up words in the skolelinux en->no dictionary.
+It can take words on the commandline and using the interactive interface.
+
+Running slx-dict without any parameters starts the interactive interface.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-h, --help, --hjelp>
+
+Display a commandline parameter summary.
+
+=item B<-o, -u, --oppdater, --update>
+
+Update the dictionary to the last one available.
+
+=back
+
+=head1 INTERACTIVE USAGE
+
+The interactive mode of slx-dict works by typing in the English word or phrase
+and then pressing enter. Slx-dict will then reply the Norwegian
+translation of that word or phrase.
+
+You can also enter a Norwegian word or phrase to get the English version of that
+word or phrase by prefixing the line with an exclamation mark (!).
+
+You can also enter commands to slx-dict. The list of commands is below.
+
+=head2 INTERACTIVE COMMANDS
+
+Each command is prefixed by a hash sign (#).
+
+=over
+
+=item B<#help, #hjelp, #h>
+
+Display a small help screen
+
+=item B<#quit, #exit, #q>
+
+Quit slx-dict
+
+=item B<#upd, #oppd>
+
+Update the dictionary (same as the -o commandline option).
+
+=back
+
+=head1 NON-INTERACTIVE USAGE
+
+Non-interactive usage is very similar to interactive usage, with the notable exception
+that commands aren't available (but commandline arguments are). Note however that
+bash (the very comon shell) treats ! in a special way so you will need to use it with
+single quotes (''). "slx-dict !word" won't work but "slx-dict '!word'" will.
+
+=head1 REGULAR EXPRESSION SUPPORT
+
+slx-dict supports limited regular expressions. It supports B<^> which indicates
+"at the beginning of the line", B<$> which indicates "at the end of the line"
+and B<?> which indicates that the preceeding letter does not need to be present.
+All whitespace is flexible. So a single space is the same as 100 spaces (in regex
+terms all whitespace is converted to one single \s+).
+
+Searching for: "^test" matches all lines I<starting with> the word test.
+
+Searching for: "test$" matches all lines I<ending with> the word test.
+
+Searching for: "conten?x?t" matches all lines containing the word "context",
+"content" or "contet".
+
+You can also mix characters in a single expression. Searching for: "controls?$"
+will match lines ending with control and controls. So it will result in both
+"controls" and "discretionary access control" while searching for "^controls?$"
+will only result in controls.
+
+=head1 CONFIGURATION FILE
+
+slx-dict saves its data and configuration file to ~/.slxdict/.
+
+The configuration file is ~/.slxdict/slxdict.conf
+
+=head2 CONFIGURATION OPTIONS
+
+=over
+
+=item DictURL
+
+The full URL of to download the dictionary from. It defaults to I<http://developer.skolelinux.no/~zerodogg/slx-dict/upd/dictionary>
+which is the official dictionary mirror as of this release.
+
+=item MaxRun
+
+The maximum amount of times slx-dict can be run before it automatically checks
+if there is an updated dictionary available. Defaults to 50.
+
+=item RunTimes
+
+The amount of times slx-dict has been run since the last dictionary update.
+This value is increased on every invocation of slx-dict. You usually don't
+need to change this value manually.
+
+=item NoVersionCheck
+
+This value is not in the configuration file by default but you can add it there
+manually. If it is set to any number other than 0 slx-dict will not notify you about
+the availability of a new slx-dict release.
+
+=back
+
+=head1 AUTHOR
+
+Eskild Hustved - C<< <eskild@mandriva.org> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (C) 2006 Eskild Hustvedt, all rights reserved.
+
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
