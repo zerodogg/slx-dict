@@ -1,5 +1,5 @@
 #!/bin/bash
-# SkoleLinux-dict 0.1
+# SkoleLinux-dict 0.2
 # Copyright (C) 2004 Eskild Hustvedt 2004
 #       
 # This program is free software; you can redistribute it and/or
@@ -9,51 +9,143 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                 # GNU General Public License for more details.
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 #       
-# You should have received a copy of the GNU General Public License             # along with this program; if not, write to the Free Software
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
 #
 # The data supplied to this software is Copyright their respective author
+#
+# Konfigurasjon:
+#
+# Tjeneren du vil laste ned nye ordlister fra
+tjener="http://developer.skolelinux.no/~zerodogg/SkoleLinux-dict"
+#
+# Sett dette til programmet du vil at SkoleLinux-dict skal bruke til å laste ned
+# ordbøker ognye versjoner med.
+# Hvis den ikke er satt vil SkoleLinux-dict prøve å oppdage automatisk.
+downloader=""
+#
+# Konfigurasjon slutt
+# -------------------
+#
 echo ""
-echo "SkoleLinux-dict versjon 0.1"
+ver="0.2"
+echo "SkoleLinux-dict versjon $ver"
 LIST="./Fellesordl.eng-no"
+touch ./.SLX_RUNTIMES
+DispHelp ()
+{
+	echo ""
+	echo "-o,   --oppdater     Oppdater til nyeste ordliste"
+	echo "-l,   --liste        Bruk ordliste X"
+	echo "-h,   --hjelp        Vis denne hjelp meldingen"
+	echo ""
+	echo "Copyright (C) Eskild Hustvedt 2004"
+}
+# Autooppdag nedlaster automatisk hvis nødvendig
+DetectDownl ()
+{
+	if [ "$downloader" == "" ]; then
+		if type wget &>/dev/null; then
+			downloader="wget -q"
+		else
+			if type curl &>/dev/null; then
+				downloader="curl -sO"
+			else
+				downloader=""
+			fi
+		fi
+	fi
+}
+# Oppdater ordbok
+DictUpd ()
+{
+	DetectDownl
+	echo ""
+	if [ "$downloader" == "" ]; then
+		echo "Kunne ikke oppdage en nedlaster"
+		echo "Enten sett \"downloader=\" i denne fila til en nedlaster eller"
+		echo "installer enten wget eller curl"
+		return 1
+	fi
+	echo "0" > ./.SLX_RUNTIMES
+	echo -n "Laster ned ordbok..."
+	$downloader $tjener/upd/Fellesordl.eng-no_NEW
+	echo " ferdig"
+	NEWMD5="`md5sum ./Fellesordl.eng-no_NEW |sed -e s/"_NEW"//g`"
+	OLDMD5="`md5sum ./Fellesordl.eng-no`"
+	if [ "$NEWMD5" == "$OLDMD5" ]; then
+		echo "Ingen oppdatering tilgjengelig"
+		rm -rf ./Fellesordl.eng-no_NEW
+		return 0
+	fi
+	echo -n "Oppdaterer...."
+	diff="`diff ./Fellesordl.eng-no ./Fellesordl.eng-no_NEW`"
+	mv -f ./Fellesordl.eng-no_NEW ./Fellesordl.eng-no
+	echo " ferdig"
+	echo ""
+	echo "Vil du se hvilke endringer som har blitt gjort (diff)?"
+	read -n 1 -p "J/N? " DOYOU
+	case $DOYOU in
+		J | j | Y | y ) echo "--- diff: ---"
+		echo "$diff"
+		echo "---       ---";;
+	esac
+}	
 while [ "$#" -gt "0" ]; do
 	case $1 in
-		--liste ) if [ -e $2 ]; then
+		-l | --liste | --ordliste ) if [ -e $2 ]; then
 			LIST="$2"
 		else
 			echo "--liste: Kunne ikke finne \"$2\""
 			exit 1
 		fi
 	       shift 2	;;
-		--help ) echo "Copyright (C) Eskild Hustvedt 2004"
-		echo ""
-		echo "--liste X        Sett ordliste til X"
+		-h | --help | --hjelp ) DispHelp
 		exit 0
 		;;
+		-o | --oppdater ) DictUpd
+		exit $?
+		;;
 		*) echo "Ugyldig parameter: $1"
+		DispHelp
 		exit 1;;
 	esac
 done
-trap 'echo ""; echo ""; echo "SkoleLinux-dict 0.1 copyright (C) Eskild Hustvedt 2004"; exit 0' 2
+# Sjekk om vi har blitt kjørt 50 ganger, hvis vi har det - oppdater
+var="`cat ./.SLX_RUNTIMES`"
+let var="$var+1"
+if [ "$var" -gt "49" ]; then
+	var=0
+	echo "SkoleLinux-dict har blitt kjørt 50 ganger uten å oppdatere ordlisten."
+	echo "Tvinger oppdatering."
+	DictUpd
+fi
+echo "$var" > ./.SLX_RUNTIMES
+trap 'echo ""; echo ""; echo "SkoleLinux-dict $ver copyright (C) Eskild Hustvedt 2004"; exit 0' 2
 if [ -e "$LIST" ]; then
 	:
 else
 	echo ""
 	echo "FATAL FEIL: Kunne ikke finne ordliste: \"$LIST\""
+	echo "Prøv å kjør \"$0 --oppdater\" for å laste ned nyeste ordliste"
 	exit 1
 fi
 echo "For å avslutte trykk [CTRL]+[C]"
 while [ "1" != "2" ]; do
 	echo ""
 	read -p "Ord: " word
-	echo "---"
-	var="`cat $LIST |grep -i "$word"`"
+	echo "* * *"
+	var="`cat $LIST |grep -v "#" |grep -i "$word"`"
 	if [ "$var" == "" ]; then
 		echo "Fant ingen ord."
 	else
+		echo "   Engelsk:                    Norsk:"
+		echo "   --------                    ------"
 		echo "$var"
 	fi
-	echo "---"
+	echo "* * *"
 done

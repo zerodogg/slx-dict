@@ -1,2 +1,8 @@
+0.2
+- Lagt til --oppdater
+	* Oppdaterer til nyeste ordliste
+- Tvinger oppdatering hvis SkoleLinux-dict har blitt startet 50 ganger uten å oppdatere
+- Noen småendringer
+
 0.1
 - Initial version
