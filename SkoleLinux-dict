@@ -1,5 +1,5 @@
 #!/bin/bash
-# SkoleLinux-dict 0.2
+# SkoleLinux-dict 0.3
 # Copyright (C) 2004 Eskild Hustvedt 2004
 #       
 # This program is free software; you can redistribute it and/or
@@ -24,15 +24,28 @@
 tjener="http://developer.skolelinux.no/~zerodogg/SkoleLinux-dict"
 #
 # Sett dette til programmet du vil at SkoleLinux-dict skal bruke til å laste ned
-# ordbøker ognye versjoner med.
+# ordbøker og nye versjoner med.
 # Hvis den ikke er satt vil SkoleLinux-dict prøve å oppdage automatisk.
 downloader=""
+#
+# Sett dette til nedlastingsprogrammet du vil bruke til å hente,
+# informasjon fra Clue, f.eks wget (-q).
+# Dersom du forandrer dette, husk å sjekke hva -O valget til wget gjør
+# og finn det korresponderende valget for det du setter den til.
+ClueGet="wget -q -O"
+#
+# Hvis dette er aktivert vil SkoleLinux-dict sjekke Clue når den ikke finner ordet.
+# Sett dette til:
+# 0 = For å ikke bruke Clue
+# 1 = For å bruke clue
+# Alt annet teller som 0
+BrukClue="1"
 #
 # Konfigurasjon slutt
 # -------------------
 #
 echo ""
-ver="0.2"
+ver="0.3"
 echo "SkoleLinux-dict versjon $ver"
 LIST="./Fellesordl.eng-no"
 touch ./.SLX_RUNTIMES
@@ -58,6 +71,38 @@ DetectDownl ()
 				downloader=""
 			fi
 		fi
+	fi
+}
+# Hent ord fra Clue (Kode fra ClueCMD)
+QueryClue ()
+{
+	dict="UKNOMX"
+	ORD="`echo "$*" |sed -e s/" "/"+"/g`"
+	if [ "$ClueGet" == "" ]; then
+		echo "«ClueGet=» er ikke satt, kan ikke bruke clue."
+		echo "Sett «ClueGet» i denne fila for å aktivere støtte"
+		return 1
+	fi
+	if type html2text &> /dev/null; then
+		:
+	else
+		echo "For Clue lookup støtte trenger $0 «html2text»"
+		echo "Vennligst installer «html2text» pakken i din distrubusjon eller"
+		echo "last ned html2text fra http://userpage.fu-berlin.de/~mbayer/tools/html2text.html"
+		return 1
+	fi
+	ping -c 1 66.70.46.80 &>/dev/null
+	if [ "$?" != "0" ]; then
+		echo "Fikk ikke svar fra Clue's tjener."
+		return 1
+	fi
+	$ClueGet ./.cluecmd.tmp "http://66.70.46.80:5555/?lang=no&dict=${dict}&word=$ORD"
+	SVAR="`html2text -nobs ./.cluecmd.tmp |grep -vF "Clue lookup er Clue Norges nye online-tjeneste. Vi tilbyr deler av ordboken" |grep -vF "til fritt oppslag. Vi gjør oppmerksom på at både demoversjon og fullversjon" |grep -vF "av Clue elektroniske ordbok har flere funksjonaliteter og et mer omfattende" |grep -vF "ordforråd enn Clue lookup." |grep -vF "cluelogo" |grep -vF "Tysk-Norsk/Spansk-Engelsk/Fransk-Engelsk/Norsk-Tysk/" |grep -vF "One of" |grep -vF "OK" |grep -vFi "Norsk-Norsk" |grep -vFi "Ordbok" |grep -vF "Engelsk" |grep -vF "Fransk" |grep -vFi "Kontakt_oss" |grep -vF "Svensk" |grep -vF "Tilbake" |grep -vF "Tips" |grep -vF "1. Har du valgt riktig språkpar?" |grep -vF "2. Er ordet stavet korrekt?" |grep -vF "3. Har du brukt oppslagsformen av ordet?"`"
+	rm -rf ./.cluecmd.tmp
+	if [ "`echo "$SVAR" |grep "Finner ikke ordet"`" != "" ]; then
+		echo "Clue lookup fant heller ikke ordet."
+	else
+		echo "$SVAR"
 	fi
 }
 # Oppdater ordbok
@@ -141,10 +186,15 @@ while [ "1" != "2" ]; do
 	echo "* * *"
 	var="`cat $LIST |grep -v "#" |grep -i "$word"`"
 	if [ "$var" == "" ]; then
-		echo "Fant ingen ord."
+		if [ "$BrukClue" == "1" ]; then
+			echo "Fant ikke ordet i Skolelinux ordboka, sjekker Engelsk->Norsk Clue lookup ordbok..."
+			QueryClue "$word"
+		else
+			echo "Fant ingen ord."
+		fi
 	else
-		echo "   Engelsk:                    Norsk:"
-		echo "   --------                    ------"
+		echo "Engelsk:                                                           Norsk:"
+		echo "--------                                                           ------"
 		echo "$var"
 	fi
 	echo "* * *"

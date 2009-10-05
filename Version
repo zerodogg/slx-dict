@@ -1,3 +1,8 @@
+0.3
+- Headeren med "Norsk" og "Engelsk" over teksten forandret til å støtte det nye
+  GenSLXDict (generer skolelinux ordbok)
+- La til støtte for Clue Lookup
+
 0.2
 - Lagt til --oppdater
 	* Oppdaterer til nyeste ordliste
