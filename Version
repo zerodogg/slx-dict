@@ -1,3 +1,16 @@
+0.6
+- Grep kalles nå med "--"
+- Når du avslutter sier den nå slx-dict
+- Fikset en bug hvor hvis du trykket enter uten noen ting så ville den alikevel
+   skrive * * * to ganger
+- Fikset en bug hvor den ville opplyse et feil antall ganger hvis MAXRUN ikke
+   var 50 (den ville alltid påstå 50)
+- Vil nå sjekke om du får treff på enkeltord hvis uklart søk mislyktes.
+- La til parmeter -id/--ingen-diff
+	- gjør at slx-dict ikke vil spørre om du vil se diff
+	  (veldig grei til f.eks cronjobber som oppdaterer ordlisten)
+- Oppdatert --hjelp
+
 0.5
 - Viser ikke lenger hele ordlisten når du ikke skriver inn et ord
 - La til --myk-oppdatering

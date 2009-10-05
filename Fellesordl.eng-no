@@ -1,6 +1,17 @@
 abort                                                              avbryte, annullere
 aborted                                                            avbrutt
 accelerator                                                        snarvei(stast) (keybinding/shortcut key=hurtigtast) (se nærmere forklaring)
+accent                                                             aksenttegn
+acute                                                              akutt-tegn ( ´ , f.eks.: idé)
+breve                                                              breve-tegn ( Ø )
+cedilla                                                            cédille ( Ç , brukes i utenlandske ord, f.eks.: garçon)
+circumflex                                                         sirkumfleks ( ^ , f.eks.: dyrefôr)
+dieresis/umlaut                                                    trema ( ¨ , brukes i utenlandske navn f.eks.: Noël)
+grave                                                              gravistegn ( ` , f.eks.: òg)
+há ek/caron                                                        caron, há ek ( Ç )
+macron                                                             makron ( ¯ )
+ring                                                               ring ( Ú , på norsk i bokstaven «å»)
+tilde                                                              tilde ( ~ , f.eks.: señor)
 accept                                                             godkjenne, akseptere
 access -s                                                          tilgang
 access -v                                                          få fatt i/tak på, åpne, hente, laste
@@ -15,6 +26,7 @@ active                                                             tilgjengelig,
 activate                                                           slå på, bruke (vise e.l)
 activated                                                          slått på, i bruk, (synlig)
 activation gestures                                                se keyboard gestures (eventuelt også stroke)
+acute                                                              se accent
 (adaptive) supersampling                                           adaptiv utjevning
 adapt                                                              tilpasse
 addition to                                                        så vel som, i tillegg til, og ...
@@ -39,6 +51,7 @@ alpha                                                              alfa
 alpha-percentile                                                   alfa-persentil
 ambiguous                                                          flertydig, tvetydig
 amortization                                                       avskrivning (ved immaterielle eiendeler) [økon] (se også: depreciation)
+amortizement rate                                                  hovedstol
 angle grid                                                         vinklingsrute
 angled brackets <>                                                 se brackets
 animated graphic                                                   animasjon (se også text animation)
@@ -136,7 +149,9 @@ boundary                                                           grense, ramme
 bounding box                                                       avgrensingsboks
 brackets (), <>, {}, []                                            parenteser (generelt)
 angled brackets <>                                                 vinkelparenteser, vinkeltegn
+ceil(ing) brackets                                                 takklammer
 curly brackets {}                                                  krøllparenteser ( -klammeparenteser-)
+floor brackets                                                     gulvklammer
 square brackets []                                                 hakeparenteser ( -klammeparenteser-)
 break                                                              skift (fellesbetegnelse bare for sideskift og spalteskift)
 column break                                                       spalteskift
@@ -144,6 +159,7 @@ line break                                                         linjeskift
 page break                                                         sideskift
 breaking space                                                     mykt mellomrom (se også non-breaking space)
 break point                                                        stoppunkt, avbruddspunkt
+breve                                                              se accent
 broad band                                                         bredbånd
 broadcast                                                          kringkaste/kringkasting
 browse                                                             bla gjennom, surfe, bla, lete, søke
@@ -176,7 +192,9 @@ callback process                                                   tilbakekallsp
 cancel                                                             avbryte, annullere, kansellere (et innlegg på USENET)
 capital asset                                                      se asset
 caption                                                            bildetekst
-caret                                                              sirkumfleks (tegnet ^), skrivemerke, innsettingspunkt
+cardinal number                                                    grunntall, kardinaltall
+caret                                                              sirkumfleks (tegnet ^), skrivemerke, innsettingspunkt. Se også accent
+caron/há ek                                                        Se accent
 carriage return                                                    linjeskift (tegn), retur (tast), vognretur (CR-tegnet)
 case sensitive                                                     skill mellom små og store bokstaver ( -versalfølsom-)
 cash flow                                                          kontantstrøm [økon]
@@ -185,6 +203,8 @@ category                                                           kategori
 cc                                                                 kopi (til)
 cd-burner                                                          cd-brenner
 cd-rom                                                             cd-rom, CD-ROM (bestemt form: CD-ROM-en), CD-spiller
+cedilla                                                            se accent
+ceiling) brackets                                                  se brackets
 cell                                                               celle
 certificate                                                        sertifikat
 certificate authority (CA)                                         sertifikatutsteder, sertifiseringsinstans, ( -sertifikatautoritet, sertifikatinstans-)
@@ -208,11 +228,12 @@ checkpoint -v                                                      oppdatere
 check spelling                                                     stavekontroll
 checksum                                                           kontrollsum, sjekksum
 chi square distribution                                            se distribution
-child process                                                      barneprosess, underprosess
+child process                                                      barneprosess, underprosess, underoppføringer
 chip                                                               brikke, integrert krets
 chipset                                                            brikkesett
 chunk size                                                         oppdelingsstørrelse
 cipher                                                             krypteringsmetode
+circumflex                                                         se accent
 city (i adresser)                                                  poststed ( -by-)
 ClassPath                                                          klassesti
 cleanup                                                            rydde opp, opprydding
@@ -312,13 +333,14 @@ country code                                                       landskode (ek
 coupon rate                                                        pålydende (=nominell) obligasjonsrente [økon]
 covariance                                                         kovarians [mat/stat]
 CPU                                                                prosessor, sentralenhet, CPU
-crash                                                              kræsj, sammenbrudd
+crash                                                              krasj, sammenbrudd
 create                                                             lage, opprette, skape
 credentials                                                        akkreditiver, referanser
 credits                                                            medvirkning/medvirkende, bidrag(-sytere)
 crop                                                               beskjære
 cross-device                                                       som virker på mange slags enheter
 cryptology                                                         kryptologi
+ctl (complex text layout)                                          kompleks tekstutforming
 cubic spline                                                       tredjegradskurvei
 cue-file                                                           (i forbindelse med brenning av CD/DVD) cue-fil
 cumulative interest payment                                        kumulativ rentebetaling [økon]
@@ -385,8 +407,11 @@ device                                                             enhet
 device number                                                      enhetsnummer
 dialog                                                             dialogvindu, meldingsvindu
 dialog box                                                         dialogvindu ( -dialogboks-; se også «bildeordboka» over menyer/knapper o.l.)
+dieresis/umlaut                                                    se accent
 diff -s                                                            differansefil
 diff -v                                                            finn differanse/forskjell
+differentiation sign                                               differensial [mat]
+differentiation                                                    derivering, forskjell, ulikhet, differensial [mat]
 digitizer                                                          1. analog til digital omvandler
                                                                    2. datapenn (museerstatning)
 directory                                                          mappe (eg. «katalog», men vi vil bruke bare ett ord for både «folder» og «directory»)
@@ -489,6 +514,7 @@ ex.                                                                eks.
 exit                                                               avslutt(e), (gå) tilbake
 exit status                                                        avslutningskode, -status, utgangsstatus, sluttstatus
 expand                                                             utvide
+exponent                                                           eksponent
 expire                                                             gyldig til, utgå (på dato), utløpe, overskride
 exponential                                                        eksponentiell
 exponential distribution                                           se distribution
@@ -528,10 +554,11 @@ fixed time/date/.. (time/.. fix)                                   fastsatt tid/
 fixed string                                                       fast streng
 fixed width font:                                                  ikke-proporsjonal (skrift), fastbreddeskrift, ( -skrivemaskinskrift-)
 flag                                                               (status-)flagg, statusindikator
-flamewar                                                           mudderkasting, flammekrig
+flamewar                                                           nettkrangel (ev. e-postkrangel, irc-krangel e.l.) -mudderkasting, flammekrig-
 flatten image                                                      flat ut bilde
 floating toolbar                                                   flytende verktøylinje
 floating point number                                              flyttall (teknisk), desimaltall
+floor brackets                                                     se brackets
 floppy (disk)                                                      diskett
 floppy station                                                     diskettstasjon
 flow                                                               flyt, strøm
@@ -578,12 +605,14 @@ gradient                                                           fargeovergang
 grab                                                               fange (inn), fange opp, snappe
 graphic                                                            bilde ( -grafikk-) med unntak av bitmap og vector graphic
 gratuitous                                                         umotivert
+grave                                                              se accent
 grid                                                               rutenett ( -grind-)
 group                                                              gruppe
 group id                                                           gruppeidentitet, (gruppe-ID)
 groupware                                                          gruppevare
 guide                                                              veiviser, hjelpelinje
 ham                                                                ikke-reklame, snill-post, vennepost
+há ek/caron                                                        se accent
 hack                                                               rettelse
 hacker                                                             1. avansert databruker, dataekspert
                                                                    2. en som bryter seg inn i andre datasystemer
@@ -642,15 +671,18 @@ idle                                                               inaktiv, ledi
 illegal                                                            ugyldig, ulovlig
 image                                                              bilde, avtrykk [CD-brenning]
 image map                                                          bildekart
+imaginary numbers                                                  imaginære tall [mat]
 implement                                                          legge til/inn, innarbeide, implementere
 inactive                                                           ikke tilgjengelig, slått av, ikke i bruk, (usynlig) (Se også: active)
 inbox                                                              innboks
 include file                                                       legg til/inkluder fil, (inkluderingsfil)
 include                                                            inneholde, inkludere
+income                                                             inntekt
 increment operator                                                 øk-operator
 indent                                                             rykk inn, innrykk
 independence test                                                  uavhengighetstest (test om to stokastiske variabler er uavhengige)
 index                                                              stikkordliste, register (teknisk: indeks)
+inequality                                                         ulikhet
 inequation                                                         ulikhet
 information                                                        informasjon, opplysning
 initialization                                                     oppstart, klargjøring, initiering
@@ -659,6 +691,8 @@ input                                                              inndata
 instalment                                                         avdrag [økon]
 instant messaging (IM)                                             lynmelding(stjeneste)
 annual instalment                                                  årlig avdrag [økon]
+integer                                                            heltall
+integral                                                           integral
 integrity                                                          integritet
 interactive                                                        interaktiv
 interest                                                           rente [økon]
@@ -712,6 +746,7 @@ journaling                                                         journalførend
 joystick                                                           styrespak, styrepinne, ( -joystick-)
 jump                                                               hoppe, springe
 k-th                                                               k-te (f.eks. det k-te elementet)
+kerning                                                            kerning
 key -s                                                             nøkkel
 key -v                                                             tast (-e)
 key escrow                                                         nøkkeldeponering
@@ -788,6 +823,7 @@ maintainer                                                         vedlikeholder
 maintain                                                           vedlikeholde
 major                                                              hoved- (-nummer, for enhet)
 makefile                                                           kompileringsfil, (makefile, fil med kompileringsregler)
+makron (diakritisk tegn)                                           se accent
 malformed (URL)                                                    ugyldig, (skadet), ( -misformet-)
 malware                                                            skadeprogram
 manage                                                             håndtere, behandle
@@ -827,12 +863,14 @@ menubar                                                            menylinje (se
 merge                                                              slå sammen, flette, fletting
 message                                                            melding, beskjed, brev ( = e-brev/e-post), innlegg [på USENET]
 messenger                                                          den som gir beskjed, bud, kurér
+metric                                                             metrisk, metrikk, (i noen tilfeller også:) målestokk, mål
 MIME Type:                                                         MIME-type:
 minor                                                              undernummer (for enhet)
 mirror                                                             speil, speiling, fillager, nettarkiv, adresse, plassering
 misc/miscellaneous                                                 div./diverse, forskjellig, ymse, annet
 beveled                                                            spiss (om en vinkel). Se også beveled
 mixed mode                                                         blandingsformat-, blandet
+mobile devices                                                     håndholdte enheter
 mockup                                                             modell, utkast
 mode -s                                                            modus, tilstand, måte
 moderate                                                           moderere
@@ -902,6 +940,7 @@ option                                                             valg(-mulighe
 options                                                            innstillinger (= settings, preferences), valg
 optional                                                           valgfri, frivillig
 order                                                              rekkefølge
+orientation                                                        (i programmer:) sideretning, (for skriveren:) papirretning se også page orientation. I andre tilfeller: skriv om.
 original                                                           opprinnelig, original-
 orphan                                                             foreldreløs, (avsnitts)løse linjer -faderløs, horunge- (Se også widow)
 orthogonal                                                         rettvinklet, vinkelrett, (teknisk:) ortogonal
@@ -914,24 +953,29 @@ overflow                                                           (... er blitt
 overhead sheet                                                     lysark, ( -foil, tranparent-)
 overloading (av funk.)                                             overdefinering
 override -v                                                        overkjøre, oppheve, tilsidesette
+overview                                                           oversikt
 P value                                                            P-verdi (P-verdien til en z-test, alltid stor 'P') [mat/stat]
 package                                                            pakke, programpakke
 padding                                                            luft, fyll, spaltefyll, utfylling
 page break                                                         se break
 page fault                                                         sidefeil
 page number                                                        sidetall
+page style                                                         sidestil
 page title                                                         sidetittel
 page orientation                                                   papirretning (landscape/portrait = stående/liggende)
 page break                                                         sideskift
+paint can/bucket                                                   malingsspann
 palette graphics                                                   palettbilde (bilder med et begrenset fargeutvalg)
 palmtop                                                            håndholdt, lomme-PC
 panel                                                              se window panel
+par value                                                          pålydende verdi, nominell verdi
 paragraph                                                          avsnitt ( -paragraf-)
 paragraph break                                                    avsnittsskift (teknisk: brukes av stiler)
 parameter                                                          parameter
 parent                                                             forelder-, over-
 parse                                                              tyde, lese, fortolke, tolke, analysere, parse
 parser                                                             se interpreter
+partial                                                            delvis, partiell [mat]
 partition                                                          partisjon, (diskavsnitt)
 pass phrase                                                        adgangsfrase/-setning, (adgangskode)
 password                                                           passord
@@ -940,6 +984,7 @@ patching                                                           oppdatering, 
 path, PATH                                                         sti, søkesti, filsti ( -filbane-)
 pattern                                                            mønster, søkestreng
 payload                                                            nyttelast, pakkeinnhold
+payment                                                            betaling, utbetaling
 PC-card                                                            PC-kort
 PCMCIA-card                                                        PCMCIA-kort
 peer                                                               likemann, server, tjener
@@ -971,6 +1016,7 @@ poll                                                               prøve
 polygon                                                            mangekant
 polyline                                                           flerstrekslinje
 polymorph                                                          flerformig, polymorf
+pop art                                                            popkunst
 pop-up                                                             sprettopp, oppsprett
 pop-up menu                                                        oppspretts-/sprettoppmeny, hurtigmeny, ( -flytende meny-) (Se også Context menu, eller nærmere forklaring)
 port -s                                                            port
@@ -979,7 +1025,8 @@ portable                                                           bærbar, flytt
 portmapper                                                         portmapper
 portrait page orientation                                          stående (papirretning) men: skriv ut stående på siden. (Se også landscape)
 post-connection command                                            avsluttingskommando
-postmaster                                                         postmester, -sjef
+posterize                                                          plakateffekt
+postmaster                                                         listemoderator, postmester, -sjef
 postpone -v                                                        utsette, holde tilbake
 power                                                              potens [mat]
 powerful                                                           kraftig
@@ -996,11 +1043,13 @@ preprocessor                                                       forprosessor,
 present value                                                      nåverdi [økon]
 preserve                                                           beholde, bevare
 preset                                                             forvalg(t)
+press                                                              trykk
 preview -v/s                                                       forhåndsvis(-ing)
 previous                                                           forrige, tilbake
 primary key                                                        primærnøkkel
 principal                                                          fullmaktsgiver, hoved-
 print -v                                                           skriv ut
+print range                                                        utskriftsområde
 printer -s                                                         skriver, ( -printer-)
 printer tray -s                                                    skriverskuff ( -arkmater, papirmater-)
 privacy                                                            personvern, personlige opplysninger, privatliv
@@ -1022,6 +1071,10 @@ provide -v                                                         gi, tilby
 proxy                                                              mellomtjener (proxy, stråmann, mellomvert, stedfortreder, mellommann)
 public key                                                         offentlig nøkkel
 pull down menu                                                     rullegardinmeny
+quantor                                                            kvantor, kvantifikator
+existence quantor                                                  eksistenskvantor (det finnes, for noen)
+universal quantifier                                               allkvantor (for alle/enhver)
+quotient                                                           kvotient
 quartile                                                           kvartil
 query -s                                                           spørring
 query -v                                                           spørre, be om, forespørre
@@ -1037,9 +1090,11 @@ range                                                              intervall, (d
 rank_c                                                             rang_k
 rate of return                                                     avkastning [økon]
 ratio                                                              forhold, skaleringsforhold, -rate
+rational number                                                    rasjonalt tall [mat]
 raytracing                                                         strålesporing
 read                                                               lese
 read-only                                                          skrivebeskyttet
+real number                                                        reelt tall [mat]
 reason                                                             årsak
 reboot                                                             omstart
 recall                                                             husk, last inn på ny, hent inn igjen
@@ -1048,7 +1103,7 @@ recipient                                                          mottager
 recode                                                             omkode
 reconnect                                                          koble til på nytt
 record -v                                                          ta opp
-record -s                                                          post, (plate)
+record -s                                                          post, (plate), oppføring
 recover                                                            gjenopprette, redde
 recurrence                                                         gjentagelse, tilbakekomst
 recursion                                                          rekursjon
@@ -1104,6 +1159,7 @@ revert                                                             tilbakestille
 revoke                                                             tilbakekalle, kalle tilbake
 rewritable                                                         overskrivbar
 right angled                                                       rettvinlet, vinkelrett
+ring (diakritisk tegn)                                             se accent
 root directory                                                     rotmappe (se kommentar)
 row                                                                rad
 RSS feed, RSS stream, RSS channel                                  informasjonskanal, (nyhets)kilde
@@ -1117,6 +1173,7 @@ runtime error                                                      kjørefeil
 runtime linking                                                    kjøretidskobling, dynamisk kobling
 sample                                                             utvalg
 sample rate                                                        samplingsrate
+sans serif                                                         seriffløs skrift, [teknisk] grotesk [typografi]
 saturation                                                         metning
 scan                                                               lete (gjennom), lese inn, skanne [i skanningssammenheng]
 scanner                                                            skanner (med k)
@@ -1150,6 +1207,7 @@ separating character/separator                                     skilletegn, s
 decimal separator                                                  desimaltegn
 thousands separator                                                tusenskille
 sequence                                                           rekke, (i databasesammenheng:) teller
+serif                                                              seriffskrift, [teknisk] antikva, seriff [typografi]
 server                                                             tjener, ( -server-)
 service                                                            tjeneste
 session                                                            økt, (arbeids-)periode, ( -sesjon-)
@@ -1159,6 +1217,7 @@ set operator                                                       mengdeoperato
 complement set operator                                            mengdeoperatoren komplement [mat]
 intersection set operator                                          mengdeoperatoren snitt [mat]
 union set operator                                                 mengdeoperatoren union [mat]
+difference set operator                                            mengdeoperatoren differanse, mengdedifferanse [mat]
 set -v                                                             velg(e), ( -sette-)
 settings                                                           innstillinger, oppsett
 settlement date                                                    betalingsdato, avviklingsdato
@@ -1253,16 +1312,18 @@ stroke (-v)                                                        bestryke
 stroke (-s)                                                        strek, strøk, omriss, musebevegelser
 stylesheet                                                         stilsett, ( -stilark-)
 subject                                                            emne, (om kryptering:) utstedt til, den som er sertifisert e.l.
+submenu                                                            undemeny
 submit                                                             sende (inn)
 subscribe to                                                       abonner(e) på
 subscript                                                          senket skrift
-superscript                                                        hevet skrift
 subshell                                                           underskall
-submenue                                                           undemeny
 subthread                                                          deltråd
+subtotal                                                           delsum
 succesfull                                                         vellykket, problemfri
 suffix                                                             endelse, suffiks
 summary                                                            sammendrag
+superscript                                                        hevet skrift
+superset                                                           overmengde (meget sjeldent, bruk heller den omvendte formuleringa og delmengde)
 support -s                                                         (bruker-)støtte, hjelp
 suspend                                                            hvilemodus (se også «hibernation» og «standby»)
 suppress                                                           undertrykk, hindre
@@ -1309,7 +1370,7 @@ throughput                                                         gjennomstrømm
 thumbnail                                                          miniatyr(-bilde)
 thumb print                                                        Se fingerprint
 ticket                                                             billett
-tilde                                                              tilde
+tilde                                                              se accent
 tile -s                                                            flis
 tile -v                                                            flislegge, (sette/legge) side ved side
 time                                                               tid, klokkeslett
@@ -1335,11 +1396,12 @@ transcode                                                          omkode
 transform                                                          endre, forandre, omforme, omgjøre
 transfer                                                           overføre
 transparency/translucency                                          gjennomsiktighet (se også opacity og opaque)
-transpose                                                          transponere (operasjon på en matrise)
+transpose                                                          gjøre kolonner til rader, transponere (operasjon på en matrise)
 trap -v                                                            fange
 trash                                                              søppel, avfall
 trash can                                                          papirkurv
 traversal                                                          gjennomgang
+treasury bill                                                      statskasseveksel
 tree view                                                          trevisning (se også «bildeordboka» over menyer/knapper o.l.)
 trick                                                              knep, triks
 trigger                                                            utløser [databaseterminologi]
@@ -1353,6 +1415,7 @@ two-tailed                                                         tosidig ( -to
 type -s                                                            type
 type -v                                                            skriv inn
 typeface                                                           skrifttype
+umlaut/dieresis                                                    se accent
 unable                                                             kan/klarte ikke
 unary                                                              en-, monadisk, unær, mono
 unbalanced                                                         ubalansert
@@ -1418,6 +1481,7 @@ warning                                                            advarsel, var
 web                                                                vev(en)
 web browser                                                        nettleser ( -webleser-)
 webcam, web camera                                                 nettkamera
+web forum                                                          nettforum
 webmaster                                                          vev/nettredaktør, -ansvarlig, -administrator
 web page                                                           nettside ( -webside-)
 website                                                            nettsted

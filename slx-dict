@@ -1,6 +1,7 @@
 #!/bin/bash
-# SkoleLinux-dict 0.5
+# slx-dict version 0.6
 # Copyright (C) Eskild Hustvedt 2005
+# <zerodogg [at] skolelinux [dot] no>
 #       
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -23,18 +24,27 @@
 SLXHOMEDIR="$HOME/.slxdict/"
 #
 echo ""
-ver="0.5"
+ver="0.6"
 echo "slx-dict versjon $ver"
+# Dette er standardvariabler. Trenger du å endre noe gjør det i $SLXHOMEDIR/config
 LIST="$SLXHOMEDIR/Fellesordl.eng-no"
 tjener="http://developer.skolelinux.no/~zerodogg/SkoleLinux-dict/"
 MAXRUN="50"
+NODIFF="0"
+JEGER="`basename $0`"
 DispHelp ()
 {
+	echo "Bruk: $JEGER"
+	echo "      $JEGER [VALG]"
+	echo "      $JEGER ORD1"
 	echo ""
 	echo "-o,   --oppdater          Oppdater til nyeste ordliste"
 	echo "-mo,  --myk-oppdatering   Oppdater til nyeste ordliste og start slx-dict"
+	echo "-id,  --ingen-diff        Ikke vis diff etter oppdatering"
 	echo "-l,   --liste             Bruk ordliste X"
 	echo "-h,   --hjelp             Vis denne hjelp meldingen"
+	echo ""
+	echo "-id/--ingen-diff må gis før -o/--oppdater eller -mo/--myk-oppdatering"
 	echo ""
 	echo "Copyright (C) Eskild Hustvedt 2005"
 }
@@ -57,7 +67,7 @@ OrdSoek ()
 	if [ "$#" == "0" ]; then return 0;fi
 	case $1 in
 		!o ) DictUpd; echo "";;
-		* ) local SOEK="`grep -v '#' $LIST | grep -i "$*"`"
+		* ) local SOEK="`grep -v '#' $LIST | grep -i -- "$*"`"
 	if [ "$SOEK" != "" ]; then
 		LangHeader
 		echo "$SOEK"
@@ -67,16 +77,36 @@ OrdSoek ()
 		return 0
 	fi
 	echo -n "Fant ingen ord, prøver uklart søk..."
-	local SOEK="`grep -v '#' $LIST | grep -i $1`";shift 1
+	local ORIGOPT="$*"
+	local SOEK="`grep -v '#' $LIST | grep -i -- $1`";shift 1
 	while [ "$#" -gt "0" ]; do
-		local SOEK="`echo "$SOEK" |grep -i "$1"`"
+		local SOEK="`echo "$SOEK" |grep -i -- "$1"`"
 		shift 1
 	done
 	if [ "$SOEK" != "" ]; then
 		echo " funnet";	LangHeader
 		echo "$SOEK"
 	else
-		echo " mislyktes"
+		echo -n " mislyktes. Søker etter individuelle ord..."
+		for a in $ORIGOPT; do
+			local SOEK="`grep -v '#' $LIST |grep -i -- $a`"
+			if [ "$SOEK" != "" ]; then
+				local TREFF="$TREFF $a"
+			fi
+		done
+		if [ "$TREFF" == "" ]; then
+			echo "mislyktes"
+		else
+			echo ""
+			echo -n "Fikk treff på:"
+			local var=0
+			for a in $TREFF; do
+				if [ "$var" == "1" ]; then echo -n ",";fi
+				echo -n " $a"
+				local var=1
+			done
+			echo "."
+		fi
 	fi ;;
 	esac
 }
@@ -137,13 +167,13 @@ DictUpd ()
 		fi
 	fi
 	echo -n "Oppdaterer...."
-	if type diff &>/dev/null && [ "$FELLESEXIST" == "1" ]; then
+	if type diff &>/dev/null && [ "$FELLESEXIST" == "1" ] && [ "$NODIFF" != "1" ]; then
 		diff="`diff -BrauN ./Fellesordl.eng-no ./Fellesordl.eng-no_NEW`"
 	fi
 	mv -f ./Fellesordl.eng-no_NEW ./Fellesordl.eng-no
 	echo " ferdig"
 	echo ""
-	if type diff &>/dev/null && [ "$FELLESEXIST" == "1" ]; then
+	if type diff &>/dev/null && [ "$FELLESEXIST" == "1" ] && [ "$NODIFF" != "1" ]; then
 		echo "Vil du se hvilke endringer som har blitt gjort (diff)?"
 		read -n 1 -p "J/N? " DOYOU
 		case $DOYOU in
@@ -152,7 +182,7 @@ DictUpd ()
 			echo "---       ---";;
 		esac
 	else
-		if [ "$FELLESEXIST" == "1" ]; then echo "\"diff\" er ikke tilgjengelig, kan ikke vise endringslogg"; fi
+		if [ "$FELLESEXIST" == "1" ] && [ "$NODIFF" != "1" ]; then echo "\"diff\" er ikke tilgjengelig, kan ikke vise endringslogg"; fi
 	fi
 }
 # Last ordlisten
@@ -224,7 +254,13 @@ while [ "$#" -gt "0" ]; do
 		exit $?
 		;;
 		-mo | --myk-oppdatering ) DictUpd;echo "" ;;
-		*) InitOrdliste; OrdSoek "$*"; exit 0;;
+		-id | --ingen-diff ) NODIFF=1;;
+		*) InitOrdliste; 
+		for a in "$@"; do
+			echo ""
+			echo "Søker etter «$a»:"
+			OrdSoek "$a"
+		done; exit 0;;
 	esac
 	shift 1
 done
@@ -239,14 +275,16 @@ if [ "$var" -ge "$MAXRUN" ]; then
 	DictUpd
 fi
 echo "$var" > ./.SLX_RUNTIMES
-trap 'echo ""; echo ""; echo "SkoleLinux-dict $ver copyright (C) Eskild Hustvedt 2005"; exit 0' 2
+trap 'echo ""; echo ""; echo "Slx-Dict $ver copyright (C) Eskild Hustvedt 2005"; exit 0' 2
 echo "For å avslutte trykk [CTRL]+[C] - skriv !o for å oppdatere ordlisten"
 InitOrdliste
 echo ""
 while true; do
 	read -p "Ord: " word
-	echo "* * *"
-	OrdSoek $word
-	echo "* * *"
-	echo ""
+	if [ "$word" != "" ]; then
+		echo "* * *"
+		OrdSoek $word
+		echo "* * *"
+		echo ""
+	fi
 done
