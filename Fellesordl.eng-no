@@ -1,4 +1,3 @@
-      video = film
 abort                                                              avbryte, annullere
 aborted                                                            avbrutt
 accelerator                                                        snarvei(stast) (keybinding/shortcut key=hurtigtast) (se nærmere forklaring)
@@ -20,6 +19,7 @@ addition to                                                        så vel som, i
 add                                                                legge til, tilføye, addere
 add ins (OOo)                                                      %Productname-tillegg
 add ons (OOo)                                                      scalc-tillegg
+adware                                                             reklameprogram
 agenda                                                             tidsplan, møteplan, gjøremål
 aggregate                                                          resultatmengde
 aggregate function                                                 resultatmengdefunksjon
@@ -79,7 +79,7 @@ autoview                                                           automatisk vi
 autoview                                                           autovising
 available                                                          tilgjengelig, disponibel
 back button                                                        tilbakeknapp
-backend                                                            motor (eks. «kalendermotor» for «calendar motor»)
+backend                                                            bakstykke (som ligger mellom sluttbrukerprogram og f.eks en stavekontroll)
 backslash                                                          omvendt skråstrek
 backspace                                                          rettetast ( -tilbaketast-)
 backup                                                             reservekopi, sikkerhetskopi
@@ -162,7 +162,7 @@ cc                                                                 kopi (til)
 cd-burner                                                          cd-brenner
 cd-rom                                                             cd-rom, CD-ROM (bestemt form: CD-ROM-en), CD-spiller
 certificate                                                        sertifikat
-certificate authority                                              sertifiseringsinstans, ( -sertifikatautoritet, sertifikatinstans-)
+certificate authority (CA)                                         sertifiseringsinstans, ( -sertifikatautoritet, sertifikatinstans-)
 certificate revokation/revocation list                             (sertifikat)tilbakekallingsliste
 challenge -s/v                                                     utfordring, utfordre
 change                                                             endre, skifte ( -rette-)
@@ -203,6 +203,7 @@ clobbered                                                          rotete
 close                                                              lukke
 clustering                                                         å klynge sammen, klyngeteknologi ?
 cluster                                                            sektorgruppe (i disksammenheng), klynge (ellers)
+codec                                                              Kodek
 collapse                                                           folde sammen
 collate                                                            ordne, sortere (ved utskrift)
 collation                                                          sammenligning
@@ -287,6 +288,8 @@ credits                                                            medvirkning/m
 crop                                                               beskjære
 cross-device                                                       som virker på mange slags enheter
 cryptology                                                         kryptologi
+cubic spline                                                       tredjegradskurvei
+cue-file                                                           (i forbindelse med brenning av CD/DVD) cue-fil
 cumulative interest payment                                        kumulativ rentebetaling [økon]
 curly brackets {}                                                  se brackets
 current                                                            gjeldende, nåværende (omskrivning med «denne» eller «den valgte» fungerer ofte best)
@@ -299,6 +302,7 @@ cyberspace                                                         nettet, kyber
 cykle -s                                                           syklus
 cykle -v                                                           gå gjennom
 daemon                                                             nisse
+data label                                                         Dataoverskrift (se også label)
 data source browser                                                datakildeutforsker
 date                                                               dato
 deadlock                                                           vranglås
@@ -322,6 +326,8 @@ defined                                                            angitt, oppgi
 defragment -v                                                      samle data, defragmentere (Se også fragmentation)
 degrees of freedom                                                 (antallet) frihetsgrader
 deiconify                                                          gjenopprett
+deinterlace                                                        tegn annenhver linje
+deinterlacing                                                      linjedobling (se også interlacing)
 deity error                                                        gudefeil [RPA-begrep]
 delegate [C#]                                                      delegere
 delete                                                             slette, fjerne, slettetast
@@ -360,6 +366,7 @@ discrete probability                                               diskret sanns
 discretionary access control                                       skjønnsmessig adgangskontroll
 disk cache folder                                                  mappe for hurtigbuffer, mellomlager på harddisk
 disk cache                                                         diskhurtigbuffer
+dispatcher                                                         starter
 display -s                                                         skjerm
 display -v                                                         vise
 dispose (C#)                                                       kaste
@@ -372,9 +379,6 @@ chi square distribution                                            kjikvadratfor
 exponential distribution                                           eksponentialfordelingen
 F distribution                                                     F-fordeling (stor «F» uansett)
 t-distribution                                                     t-fordeling (liten «t» uansett)
-daemon                                                             nisse
-deinterlace                                                        tegn annenhver linje
-deinterlacing                                                      linjedobling (se også interlacing)
 distribution list                                                  e-postliste, distribusjonsliste, (diskusjonsliste)
 dithering                                                          fargereduseringskompensasjon
 dock                                                               feste/løsne (eksempel: «fest verktøylinja til menyraden») ( -dokk-)
@@ -435,6 +439,7 @@ environment variable                                               miljøvariabel
 errno.                                                             feilnr.
 error                                                              feil
 fatal error                                                        kritisk feil, uopprettelig feil
+error report                                                       feilmelding
 escape                                                             escape (tasten), beskytte
 escape sequence                                                    skiftesekvens
 Ethernet                                                           lokalnett, Ethernet (egennavn)
@@ -514,6 +519,7 @@ fragmentation                                                      spredning, sp
 frames                                                             rammer, bilder
 free                                                               fri, ledig, (gratis)
 free software                                                      fri programvare ( -gratis programvare-)
+freeware                                                           gratisprogram)
 frontend                                                           grenseflate
 future value                                                       sluttverdi, fremtidig verdi [økon]
 fuzzy                                                              uklar (upresis, utflytende)
@@ -667,7 +673,7 @@ kill                                                               drepe
 killed                                                             drept
 knowhow                                                            fagkunnskap, ekspertise ( -knowhow-)
 kurtosis                                                           kurvatur
-label                                                              merkelapp, etikett
+label                                                              merkelapp, etikett (se også data label)
 landscape (page orientation)                                       liggende (papirretning) men: skriv ut vannrett på siden. (Se også portrait)
 language code/tag                                                  språkkode
 laptop                                                             bærbar (datamaskin)
@@ -678,6 +684,7 @@ leakage                                                            lekkasje
 leap second                                                        skuddsekund
 Legacy system                                                      systemarv
 legend                                                             forklaring
+letterbox format                                                   brevsprekkformat
 library                                                            bibliotek
 limit                                                              grense, avgrensing
 limit pattern                                                      avgrensingsmønster
@@ -726,6 +733,7 @@ maintain                                                           vedlikeholde
 major                                                              hoved- (-nummer, for enhet)
 makefile                                                           kompileringsfil, (makefile, fil med kompileringsregler)
 malformed (URL)                                                    ugyldig, (skadet), ( -misformet-)
+malware                                                            skadeprogram
 manage                                                             håndtere, behandle
 manager                                                            håndtering, behandling
 mandatory                                                          obligatorisk, nødvendig, påbudt
@@ -888,6 +896,7 @@ pipe -s                                                            (data-)lednin
 pipe -v                                                            viderelede, overføre, kanalisere
 pipeline                                                           kommandokø, kanal
 pixel                                                              bildepunkt, piksel ( -bildeelement-)
+plain text                                                         bare tekst (ren tekst)
 plugin -s                                                          programtillegg, ( -innpluggingsprogram, (tilleggs-)modul, utvidelsesmodul, innstikk-)
 pointer                                                            pil, peker, ( -markør-)
 policy                                                             praksis, politikk
@@ -946,6 +955,7 @@ quartile                                                           kvartil
 query -s                                                           spørring
 query -v                                                           spørre, be om, forespørre
 question mode                                                      forespørselstilstand
+Quoted Printable (QP)                                              Quoted Printable (QP)
 quickstarter                                                       hurtigstarter
 quit                                                               avsluttet, avslutt
 quote                                                              sitat/sitere
@@ -1050,6 +1060,7 @@ scroll down/up                                                     rulle ned/opp
 search                                                             søke
 search engine                                                      søkemotor
 search path                                                        søkesti
+search key/string                                                  søketekst
 section                                                            bolk, del, kapittel ( -avsnitt, inndeling-)
 security (alle typer)                                              verdipapir [økon]
 segmentation fault                                                 Minnepekerfeil
@@ -1074,6 +1085,7 @@ settlement date                                                    betalingsdato
 setup                                                              oppsett, innstillinger
 shade -s                                                           skygge (over), folde sammen (om vinduer)
 share -s                                                           delt ressurs
+shareware                                                          prøveprogram
 shared library                                                     delt bibliotek
 shearing                                                           trapezering
 shell                                                              skall, kommandotolk
@@ -1110,6 +1122,7 @@ sound card                                                         lydkort
 sourcecode                                                         kildekode
 source file                                                        kildekode(fil)
 space, spacebar                                                    mellomrom
+spacing                                                            avstand, mellomrom
 spam                                                               søppelpost, ( -avfallspost, e-pest, spam, reklame,-)
 spammers                                                           (av)sendere av søppelpost
 span -s                                                            spennvidde, omfang, spenn, variasjonsbredd
@@ -1118,7 +1131,7 @@ sparse file                                                        fil med hulle
 specific                                                           bestemt, spesiell
 specify                                                            velge, angi, (spesifisere)
 spellcheck/spelling                                                stavekontroll, kjør stavekontroll
-spinbox                                                            tallbokse (se også «bildeordboka» over menyer/knapper o.l.)
+spinbox                                                            tallboks (se også«bildeordboka» over menyer/knapper o.l.)
 splash screen                                                      velkomstbilde
 splice                                                             spleise
 spool                                                              utskriftskø, kø
@@ -1143,7 +1156,7 @@ stdout                                                             standardutdat
 step                                                               steg, trinn, skritt
 step-up                                                            opptrappe/-ing
 sticky bit                                                         låst, fast, markert (f.eks om datomarkeringen på en fil, som kan låses til en bestemt dato)
-sticky                                                             (om taster:) trege
+sticky                                                             (om taster:) trege (om vinduer:) fast
 straight-line depreciation                                         se depreciation
 stream                                                             dataflyt, strøm
 streaming                                                          direkteoverføring, dataflyt
@@ -1152,7 +1165,7 @@ strip                                                              strippe, skre
 stroke (-v)                                                        bestryke
 stroke (-s)                                                        strek, strøk, omriss, musebevegelser
 stylesheet                                                         stilsett, ( -stilark-)
-subject                                                            emne
+subject                                                            emne, (om kryptering:) sertifisert til, sertifikateier
 submit                                                             sende (inn)
 subscribe to                                                       abonner(e) på
 subscript                                                          senket skrift
@@ -1165,6 +1178,7 @@ summary                                                            sammendrag
 support -s                                                         (bruker-)støtte, hjelp
 suspend                                                            hvilemodus (se også «hibernation» og «standby»)
 suppress                                                           undertrykk, hindre
+system tray                                                        systemkurv
 swap/swap space                                                    mellomlager
 switch -s                                                          nettverksveksler
 switch -v                                                          veksle
@@ -1203,6 +1217,7 @@ thread -v                                                          å trenge igje
 throbber                                                           pulsikon
 throughput                                                         gjennomstrømming
 thumbnail                                                          miniatyr(-bilde)
+thumb print                                                        Se fingerprint
 ticket                                                             billett
 tilde                                                              tilde
 tile -s                                                            flis

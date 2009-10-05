@@ -1,3 +1,7 @@
+0.4
+- Fjernet støtte for Clue Lookup ettersom de endret systemet sitt
+- Byttet navn til slx-dict
+
 0.3
 - Headeren med "Norsk" og "Engelsk" over teksten forandret til å støtte det nye
   GenSLXDict (generer skolelinux ordbok)
