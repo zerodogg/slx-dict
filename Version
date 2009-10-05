@@ -1,3 +1,20 @@
+0.5
+- Viser ikke lenger hele ordlisten når du ikke skriver inn et ord
+- La til --myk-oppdatering
+- Du kan nå lett sette opp hvor lang tid det skal ta mellom hver tvungen
+	ordlisteoppdatering ved å sette MAXRUNS variabelen i ~/.slxdict/config
+- Vil nå laste ned ordlisten hvis den ikke eksisterer
+- La til uklart søk (dersom du taster inn to ord og den eksakte strengen ikke
+   blir funnet vil den søke på setninger som inneholder begge ordene i hvilken
+   som helst rekkefølge).
+- Du kan nå skrive !o mens slx-dict kjører for å oppdatere ordlisten.
+- Hvis den nå får en ukjent kommandolinjeparmeter vil den søke etter det den
+   fikk på kommandolinja.
+- Støtter nå å laste ned en .bz2 istedenfor ukomprimert for raskere nedlasting.
+   (kun med bunzip2 installert)
+- Har nå oppsettsfil i ~/.slxdict/config
+- Ordlista lagres nå i ~/.slxdict/
+
 0.4
 - Fjernet støtte for Clue Lookup ettersom de endret systemet sitt
 - Byttet navn til slx-dict
@@ -14,4 +31,4 @@
 - Noen småendringer
 
 0.1
-- Initial version
+- Første versjon

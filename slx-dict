@@ -1,6 +1,6 @@
 #!/bin/bash
-# SkoleLinux-dict 0.4
-# Copyright (C) 2004 Eskild Hustvedt 2004
+# SkoleLinux-dict 0.5
+# Copyright (C) Eskild Hustvedt 2005
 #       
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -18,32 +18,25 @@
 #
 # The data supplied to this software is Copyright their respective author
 #
-# Konfigurasjon:
+# Oppsettet er i $SLXHOMEDIR/config
 #
-# Tjeneren og mappe du vil laste ned nye ordlister fra
-tjener="http://developer.skolelinux.no/~zerodogg/SkoleLinux-dict"
-#
-# Sett dette til programmet du vil at SkoleLinux-dict skal bruke til å laste ned
-# ordbøker og nye versjoner med.
-# Hvis den ikke er satt vil SkoleLinux-dict prøve å oppdage automatisk.
-downloader=""
-#
-# Konfigurasjon slutt
-# -------------------
+SLXHOMEDIR="$HOME/.slxdict/"
 #
 echo ""
-ver="0.4"
+ver="0.5"
 echo "slx-dict versjon $ver"
-LIST="./Fellesordl.eng-no"
-touch ./.SLX_RUNTIMES
+LIST="$SLXHOMEDIR/Fellesordl.eng-no"
+tjener="http://developer.skolelinux.no/~zerodogg/SkoleLinux-dict/"
+MAXRUN="50"
 DispHelp ()
 {
 	echo ""
-	echo "-o,   --oppdater     Oppdater til nyeste ordliste"
-	echo "-l,   --liste        Bruk ordliste X"
-	echo "-h,   --hjelp        Vis denne hjelp meldingen"
+	echo "-o,   --oppdater          Oppdater til nyeste ordliste"
+	echo "-mo,  --myk-oppdatering   Oppdater til nyeste ordliste og start slx-dict"
+	echo "-l,   --liste             Bruk ordliste X"
+	echo "-h,   --hjelp             Vis denne hjelp meldingen"
 	echo ""
-	echo "Copyright (C) Eskild Hustvedt 2004"
+	echo "Copyright (C) Eskild Hustvedt 2005"
 }
 # Autooppdag nedlaster automatisk hvis nødvendig
 DetectDownl ()
@@ -51,19 +44,53 @@ DetectDownl ()
 	if [ "$downloader" == "" ]; then
 		if type wget &>/dev/null; then
 			downloader="wget -q"
+		elif type curl &>/dev/null; then
+			downloader="curl -sO"
 		else
-			if type curl &>/dev/null; then
-				downloader="curl -sO"
-			else
-				downloader=""
-			fi
+			downloader=""
 		fi
 	fi
 }
+# Søk etter ord
+OrdSoek ()
+{
+	if [ "$#" == "0" ]; then return 0;fi
+	case $1 in
+		!o ) DictUpd; echo "";;
+		* ) local SOEK="`grep -v '#' $LIST | grep -i "$*"`"
+	if [ "$SOEK" != "" ]; then
+		LangHeader
+		echo "$SOEK"
+		return 0
+	elif [ "$#" == "1" ]; then
+		echo "Fant ingen ord."
+		return 0
+	fi
+	echo -n "Fant ingen ord, prøver uklart søk..."
+	local SOEK="`grep -v '#' $LIST | grep -i $1`";shift 1
+	while [ "$#" -gt "0" ]; do
+		local SOEK="`echo "$SOEK" |grep -i "$1"`"
+		shift 1
+	done
+	if [ "$SOEK" != "" ]; then
+		echo " funnet";	LangHeader
+		echo "$SOEK"
+	else
+		echo " mislyktes"
+	fi ;;
+	esac
+}
+# Overskriften som viser språk
+LangHeader ()
+{
+	echo "Engelsk:                                                           Norsk:"
+	echo "--------                                                           ------"
+}	
 # Oppdater ordbok
 DictUpd ()
 {
 	DetectDownl
+	local FELLESEXIST=0
 	echo ""
 	if [ "$downloader" == "" ]; then
 		echo "Kunne ikke oppdage en nedlaster"
@@ -73,28 +100,114 @@ DictUpd ()
 	fi
 	echo "0" > ./.SLX_RUNTIMES
 	echo -n "Laster ned ordbok..."
-	$downloader $tjener/upd/Fellesordl.eng-no_NEW
+	if type bunzip2 &>/dev/null; then
+		$downloader $tjener/upd/Fellesordl.eng-no_NEW.bz2
+		ret="$?"
+	else
+		$downloader $tjener/upd/Fellesordl.eng-no_NEW
+		ret="$?"
+	fi
+	if [ "$ret" != "0" ]; then
+		echo " mislyktes"
+		return 2
+	fi
 	echo " ferdig"
-	NEWMD5="`md5sum ./Fellesordl.eng-no_NEW |sed -e s/"_NEW"//g`"
-	OLDMD5="`md5sum ./Fellesordl.eng-no`"
-	if [ "$NEWMD5" == "$OLDMD5" ]; then
-		echo "Ingen oppdatering tilgjengelig"
-		rm -rf ./Fellesordl.eng-no_NEW
-		return 0
+	if type bunzip2 &>/dev/null; then
+		echo -n "Pakker ut..."
+		bunzip2 ./Fellesordl.eng-no_NEW.bz2
+		if [ "$?" != "0" ]; then
+			echo " mislyktes"
+			return 2
+		fi
+		echo " ferdig"
+	fi
+	if [ -e ./Fellesordl.eng-no ]; then
+		local FELLESEXIST=1
+		if ! type md5sum &>/dev/null; then
+			echo "\"md5sum\" ikke tilgjengelig, kan ikke sjekke om det er noen oppdatering tilgjengelig"
+			echo "Tvinger oppdatering"
+		else
+			NEWMD5="`md5sum ./Fellesordl.eng-no_NEW |sed -e s/"_NEW"//g`"
+			OLDMD5="`md5sum ./Fellesordl.eng-no`"
+			if [ "$NEWMD5" == "$OLDMD5" ]; then
+				echo "Ingen oppdatering tilgjengelig"
+				rm -f ./Fellesordl.eng-no_NEW
+				return 0
+			fi
+		fi
 	fi
 	echo -n "Oppdaterer...."
-	diff="`diff ./Fellesordl.eng-no ./Fellesordl.eng-no_NEW`"
+	if type diff &>/dev/null && [ "$FELLESEXIST" == "1" ]; then
+		diff="`diff -BrauN ./Fellesordl.eng-no ./Fellesordl.eng-no_NEW`"
+	fi
 	mv -f ./Fellesordl.eng-no_NEW ./Fellesordl.eng-no
 	echo " ferdig"
 	echo ""
-	echo "Vil du se hvilke endringer som har blitt gjort (diff)?"
-	read -n 1 -p "J/N? " DOYOU
-	case $DOYOU in
-		J | j | Y | y ) echo "--- diff: ---"
-		echo "$diff"
-		echo "---       ---";;
-	esac
-}	
+	if type diff &>/dev/null && [ "$FELLESEXIST" == "1" ]; then
+		echo "Vil du se hvilke endringer som har blitt gjort (diff)?"
+		read -n 1 -p "J/N? " DOYOU
+		case $DOYOU in
+			J | j | Y | y ) echo "--- diff: ---"
+			echo "$diff"
+			echo "---       ---";;
+		esac
+	else
+		if [ "$FELLESEXIST" == "1" ]; then echo "\"diff\" er ikke tilgjengelig, kan ikke vise endringslogg"; fi
+	fi
+}
+# Last ordlisten
+InitOrdliste ()
+{
+	if [ ! -e $LIST ]; then
+		echo ""
+		echo "FATAL FEIL: Kunne ikke finne ordliste: \"$LIST\""
+		echo "Pørver å tvinge oppdatering..."
+		DictUpd
+		if [ !  -e $LIST ]; then
+			echo ""
+			echo "Oppdateringen mislyktes, er du koblet til internett?"
+			exit 1
+		fi
+	fi
+}
+# Sjekk at SLXHOMEDIR finnes
+if [ ! -e $SLXHOMEDIR ]; then
+	echo ""
+	FLYFELL="0"
+	echo -n "Fant ikke $SLXHOMEDIR, oppretter..."
+	mkdir -p $SLXHOMEDIR || exit $?
+	if [ -e ./Fellesordl.eng-no ]; then
+		FLYFELL="1"
+		echo -n " flytter ./Fellesordl.eng-no..."
+		mv ./Fellesordl.eng-no $SLXHOMEDIR/
+	fi
+	echo -n " skriver oppsettsfil..."
+	cat << EOF > $SLXHOMEDIR/config
+# Slx-Dict oppsettsfil (for versjon $ver)
+
+# Lenke til tjeneren og mappen hvor oppdateringer av ordlisten ligger
+tjener="$tjener"
+
+# Sett dette til programmet du vil at slx-dict skal bruke til å laste ned
+# ordbøker og nye versjoner med.
+# Hvis den ikke er satt vil slx-dict prøve å oppdage automatisk.
+downloader=""
+
+# Set MAXRUN til hvor mange ganger du vil at slx-dict skal starte opp
+# uten å sjekke etter oppdateringer.
+MAXRUN="$MAXRUN"
+EOF
+	echo "$MAXRUN" > $SLXHOMEDIR/.SLX_RUNTIMES
+	echo "ferdig"
+	if [ "$FLYFELL" == "0" ]; then
+		cd "$SLXHOMEDIR"
+		echo "Tvinger oppdatering av ordlisten."
+		echo ""
+		DictUpd
+	fi
+fi
+. $SLXHOMEDIR/config
+cd "$SLXHOMEDIR"
 while [ "$#" -gt "0" ]; do
 	case $1 in
 		-l | --liste | --ordliste ) if [ -e $2 ]; then
@@ -103,22 +216,23 @@ while [ "$#" -gt "0" ]; do
 			echo "--liste: Kunne ikke finne \"$2\""
 			exit 1
 		fi
-	       shift 2	;;
+	       shift 1	;;
 		-h | --help | --hjelp ) DispHelp
 		exit 0
 		;;
 		-o | --oppdater ) DictUpd
 		exit $?
 		;;
-		*) echo "Ugyldig parameter: $1"
-		DispHelp
-		exit 1;;
+		-mo | --myk-oppdatering ) DictUpd;echo "" ;;
+		*) InitOrdliste; OrdSoek "$*"; exit 0;;
 	esac
+	shift 1
 done
-# Sjekk om vi har blitt kjørt 50 ganger, hvis vi har det - oppdater
+touch ./.SLX_RUNTIMES
+# Sjekk om vi har blitt kjørt $MAXRUN ganger, hvis vi har det - oppdater ordlisten
 var="`cat ./.SLX_RUNTIMES`"
 let var="$var+1"
-if [ "$var" -gt "49" ]; then
+if [ "$var" -ge "$MAXRUN" ]; then
 	var=0
 	echo "SkoleLinux-dict har blitt kjørt 50 ganger uten å oppdatere ordlisten."
 	echo "Tvinger oppdatering."
@@ -126,26 +240,13 @@ if [ "$var" -gt "49" ]; then
 fi
 echo "$var" > ./.SLX_RUNTIMES
 trap 'echo ""; echo ""; echo "SkoleLinux-dict $ver copyright (C) Eskild Hustvedt 2005"; exit 0' 2
-if [ -e "$LIST" ]; then
-	:
-else
-	echo ""
-	echo "FATAL FEIL: Kunne ikke finne ordliste: \"$LIST\""
-	echo "Prøv å kjør \"$0 --oppdater\" for å laste ned nyeste ordliste"
-	exit 1
-fi
-echo "For å avslutte trykk [CTRL]+[C]"
-while [ "1" != "2" ]; do
-	echo ""
+echo "For å avslutte trykk [CTRL]+[C] - skriv !o for å oppdatere ordlisten"
+InitOrdliste
+echo ""
+while true; do
 	read -p "Ord: " word
 	echo "* * *"
-	var="`cat $LIST |grep -v "#" |grep -i "$word"`"
-	if [ "$var" == "" ]; then
-		echo "Fant ingen ord."
-	else
-		echo "Engelsk:                                                           Norsk:"
-		echo "--------                                                           ------"
-		echo "$var"
-	fi
+	OrdSoek $word
 	echo "* * *"
+	echo ""
 done
